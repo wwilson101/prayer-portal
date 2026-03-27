@@ -164,12 +164,19 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
 function CreateGroupModal({ onClose, onCreate }) {
   const [form, setForm] = useState({ name: '', description: '' });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const errs = {};
     if (!form.name.trim()) errs.name = 'Group name is required';
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    onCreate({ name: form.name.trim(), description: form.description.trim() });
+    setLoading(true);
+    try {
+      await onCreate({ name: form.name.trim(), description: form.description.trim() });
+    } catch {
+      setErrors({ name: 'Failed to create group. You may not have permission.' });
+      setLoading(false);
+    }
   };
 
   return (
@@ -214,10 +221,9 @@ function CreateGroupModal({ onClose, onCreate }) {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={onClose} className="btn-ghost flex-1">Cancel</button>
-            <button onClick={handleCreate} className="btn-primary flex-1 flex items-center justify-center gap-2">
-              <Plus size={16} />
-              Create Group
+            <button onClick={onClose} disabled={loading} className="btn-ghost flex-1">Cancel</button>
+            <button onClick={handleCreate} disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-60">
+              {loading ? 'Creating...' : <><Plus size={16} />Create Group</>}
             </button>
           </div>
         </div>
@@ -350,7 +356,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
       {showCreate && (
         <CreateGroupModal
           onClose={() => setShowCreate(false)}
-          onCreate={(data) => { onCreateGroup(data); setShowCreate(false); }}
+          onCreate={async (data) => { await onCreateGroup(data); setShowCreate(false); }}
         />
       )}
       {showJoin && (

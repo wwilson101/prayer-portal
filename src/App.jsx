@@ -145,7 +145,7 @@ export default function App() {
   }
 
   const handleCreateGroup = async (data) => {
-    if (!user) return
+    if (!user || !user.isAdmin) return
     try {
       const newGroup = await createGroup(data, user.id, user.name)
       setGroups(prev => [...prev, newGroup])
