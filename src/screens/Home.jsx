@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Filter, Sparkles } from 'lucide-react';
+import { Plus, Search, ListFilter as Filter, Sparkles } from 'lucide-react';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 
@@ -65,7 +65,8 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
             placeholder="Search prayers..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="input-field pl-10 py-2.5 text-sm"
+            className="input-field py-2.5 text-sm"
+            style={{ paddingLeft: '2.25rem' }}
           />
         </div>
 
