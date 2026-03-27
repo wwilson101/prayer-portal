@@ -7,7 +7,7 @@ import PrayerDetail from '../components/PrayerDetail';
 export default function Home({ user, prayers, groups, onPray, onMarkAnswered, onAddPrayer }) {
   const [selectedPrayer, setSelectedPrayer] = useState(null);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('active');
 
   const myGroupIds = groups
     .filter(g => g.members.some(m => m.id === user.id))
