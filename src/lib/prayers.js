@@ -18,7 +18,7 @@ export const getPrayers = async (myGroupIds) => {
   // Fetch prayers + owner profile in one go
   const { data: prayers, error: pError } = await supabase
     .from('prayers')
-    .select('*, profiles(name, phone)')
+    .select('*, profiles!prayers_owner_id_fkey(name, phone)')
     .in('id', prayerIds)
     .order('request_date', { ascending: false })
 

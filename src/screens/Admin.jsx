@@ -40,7 +40,7 @@ export default function Admin({ currentUserId }) {
       setGroups(g)
       setPrayers(p)
     } catch (err) {
-      setError(`Failed to load admin data: ${err?.message || JSON.stringify(err)}`)
+      setError('Failed to load admin data. Make sure your account has admin privileges.')
     } finally {
       setLoading(false)
     }

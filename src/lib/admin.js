@@ -41,7 +41,7 @@ export const adminGetAllGroups = async () => {
 export const adminGetAllPrayers = async () => {
   const { data, error } = await supabase
     .from('prayers')
-    .select('*, profiles(name)')
+    .select('*, profiles!prayers_owner_id_fkey(name)')
     .order('created_at', { ascending: false })
   if (error) throw error
   return data.map(p => ({
