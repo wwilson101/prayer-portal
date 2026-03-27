@@ -115,3 +115,17 @@ export const adminDeleteUser = async (userId) => {
     .eq('id', userId)
   if (error) throw error
 }
+
+export const adminGetUserProfile = async (userId) => {
+  const [profileRes, prayersRes, groupsRes] = await Promise.all([
+    supabase.from('profiles').select('id, name, phone, is_admin, created_at').eq('id', userId).maybeSingle(),
+    supabase.from('prayers').select('id, title, status, request_date').eq('owner_id', userId).order('request_date', { ascending: false }),
+    supabase.from('group_members').select('group_id, joined_at, groups(name)').eq('user_id', userId),
+  ])
+  if (profileRes.error) throw profileRes.error
+  return {
+    ...profileRes.data,
+    prayers: prayersRes.data || [],
+    groups: (groupsRes.data || []).map(m => ({ id: m.group_id, name: m.groups?.name || 'Unknown', joinedAt: m.joined_at })),
+  }
+}

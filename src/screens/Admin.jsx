@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen, Mail } from 'lucide-react'
-import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser, adminSendPasswordReset } from '../lib/admin'
+import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen, Mail, Eye, X, Phone, BookMarked, CircleCheck as CheckCircle } from 'lucide-react'
+import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser, adminSendPasswordReset, adminGetUserProfile } from '../lib/admin'
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers'
 
 function SectionHeader({ title, count, expanded, onToggle }) {
@@ -21,6 +21,118 @@ function SectionHeader({ title, count, expanded, onToggle }) {
   )
 }
 
+function UserProfileModal({ userId, currentUserId, onClose }) {
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    adminGetUserProfile(userId).then(p => { setProfile(p); setLoading(false) }).catch(() => setLoading(false))
+  }, [userId])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.7)' }} onClick={onClose}>
+      <div
+        className="w-full max-w-lg rounded-t-3xl pb-8 pt-5 px-5 space-y-4"
+        style={{ background: '#111111', maxHeight: '85vh', overflowY: 'auto' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-base font-bold" style={{ color: '#f0ede0' }}>User Profile</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#1a1a1a', color: '#c8b99a' }}>
+            <X size={15} />
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="py-12 text-center text-sm" style={{ color: '#c8b99a' }}>Loading...</div>
+        ) : !profile ? (
+          <div className="py-12 text-center text-sm text-red-400">Failed to load profile.</div>
+        ) : (
+          <>
+            <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ background: '#0d0d0d' }}>
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${getAvatarColor(profile.name)} flex items-center justify-center flex-shrink-0`}>
+                <span className="text-white text-lg font-bold">{getInitials(profile.name)}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-base font-bold" style={{ color: '#f0ede0' }}>{profile.name}</p>
+                  {profile.is_admin && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#1a1204', color: '#a89060' }}>Admin</span>
+                  )}
+                  {profile.id === currentUserId && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#1a2e22', color: '#a89060' }}>You</span>
+                  )}
+                </div>
+                <p className="text-xs mt-0.5" style={{ color: '#c8b99a' }}>Joined {formatDate(profile.created_at)}</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl space-y-3" style={{ background: '#0d0d0d' }}>
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#a89060' }}>Contact Info</p>
+              {profile.phone ? (
+                <div className="flex items-center gap-2 text-sm" style={{ color: '#c8b99a' }}>
+                  <Phone size={13} style={{ color: '#a89060' }} />
+                  <span>{profile.phone}</span>
+                </div>
+              ) : (
+                <p className="text-sm" style={{ color: '#6b6360' }}>No phone number on file</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: 'Prayers', value: profile.prayers.length, icon: BookMarked },
+                { label: 'Answered', value: profile.prayers.filter(p => p.status === 'answered').length, icon: CheckCircle },
+                { label: 'Groups', value: profile.groups.length, icon: Users },
+              ].map(({ label, value, icon: Icon }) => (
+                <div key={label} className="rounded-xl p-3 text-center" style={{ background: '#0d0d0d' }}>
+                  <Icon size={14} className="mx-auto mb-1" style={{ color: '#a89060' }} />
+                  <p className="text-xl font-bold" style={{ color: '#f0ede0' }}>{value}</p>
+                  <p className="text-[11px]" style={{ color: '#c8b99a' }}>{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {profile.groups.length > 0 && (
+              <div className="p-4 rounded-2xl space-y-2" style={{ background: '#0d0d0d' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#a89060' }}>Groups</p>
+                {profile.groups.map(g => (
+                  <div key={g.id} className="flex items-center justify-between py-1.5 border-b last:border-0" style={{ borderColor: '#1a1a1a' }}>
+                    <span className="text-sm" style={{ color: '#f0ede0' }}>{g.name}</span>
+                    <span className="text-xs" style={{ color: '#c8b99a' }}>Joined {formatDate(g.joinedAt)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {profile.prayers.length > 0 && (
+              <div className="p-4 rounded-2xl space-y-2" style={{ background: '#0d0d0d' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#a89060' }}>Recent Prayers</p>
+                {profile.prayers.slice(0, 5).map(p => (
+                  <div key={p.id} className="flex items-center justify-between py-1.5 border-b last:border-0" style={{ borderColor: '#1a1a1a' }}>
+                    <span className="text-sm truncate flex-1 mr-2" style={{ color: '#f0ede0' }}>{p.title}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 font-semibold"
+                      style={p.status === 'answered'
+                        ? { background: '#0f1e14', color: '#a89060' }
+                        : { background: '#1a2e22', color: '#c8b99a' }
+                      }
+                    >
+                      {p.status}
+                    </span>
+                  </div>
+                ))}
+                {profile.prayers.length > 5 && (
+                  <p className="text-xs text-center pt-1" style={{ color: '#6b6360' }}>+ {profile.prayers.length - 5} more</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Admin({ currentUserId }) {
   const [users, setUsers]       = useState([])
   const [groups, setGroups]     = useState([])
@@ -29,6 +141,7 @@ export default function Admin({ currentUserId }) {
   const [error, setError]       = useState('')
   const [expandedSection, setExpandedSection] = useState('users')
   const [actionLoading, setActionLoading] = useState(null)
+  const [viewingUserId, setViewingUserId] = useState(null)
 
   const load = async () => {
     setLoading(true)
@@ -134,6 +247,13 @@ export default function Admin({ currentUserId }) {
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
+      {viewingUserId && (
+        <UserProfileModal
+          userId={viewingUserId}
+          currentUserId={currentUserId}
+          onClose={() => setViewingUserId(null)}
+        />
+      )}
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
         <div className="flex items-center justify-between">
           <div>
@@ -203,6 +323,16 @@ export default function Admin({ currentUserId }) {
                           )}
                         </div>
                         <p className="text-xs" style={{ color: '#c8b99a' }}>Joined {formatDate(u.created_at)}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button
+                          onClick={() => setViewingUserId(u.id)}
+                          title="View profile"
+                          className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-80 transition-colors"
+                          style={{ background: '#1a1a2e', color: '#93c5fd' }}
+                        >
+                          <Eye size={13} />
+                        </button>
                       </div>
                       {u.id !== currentUserId && (
                         <div className="flex items-center gap-1.5 flex-shrink-0">
