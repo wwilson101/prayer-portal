@@ -69,7 +69,7 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, left: '50%', transform: 'translateX(-50%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 max-h-[85vh] overflow-y-auto animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
@@ -180,7 +180,7 @@ function CreateGroupModal({ onClose, onCreate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, left: '50%', transform: 'translateX(-50%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
@@ -253,7 +253,7 @@ function JoinGroupModal({ onClose, onJoin }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, left: '50%', transform: 'translateX(-50%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">

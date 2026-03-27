@@ -1,4 +1,4 @@
-import { X, CheckCircle2, Heart, Clock, Users, Mail, Phone, Calendar } from 'lucide-react';
+import { X, CircleCheck as CheckCircle2, Heart, Clock, Users, Mail, Phone, Calendar } from 'lucide-react';
 import { formatDate, formatDateFull, getInitials, getAvatarColor } from '../utils/helpers';
 
 export default function PrayerDetail({ prayer, groups, currentUserId, onClose, onPray, onMarkAnswered }) {
@@ -16,7 +16,7 @@ export default function PrayerDetail({ prayer, groups, currentUserId, onClose, o
   const avatarColor = getAvatarColor(prayer.ownerName);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, left: '50%', transform: 'translateX(-50%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
       {/* Overlay */}
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
 

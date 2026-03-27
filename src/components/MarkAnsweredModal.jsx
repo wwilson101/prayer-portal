@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { CheckCircle2, X, Sparkles } from 'lucide-react';
+import { CircleCheck as CheckCircle2, X, Sparkles } from 'lucide-react';
 
 export default function MarkAnsweredModal({ prayer, onConfirm, onClose }) {
   const [note, setNote] = useState('');
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, left: '50%', transform: 'translateX(-50%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
