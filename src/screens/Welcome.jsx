@@ -62,10 +62,10 @@ export default function Welcome({ onAuthSuccess }) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#111211' }}>
         <div className="flex-1 flex flex-col items-center justify-center px-8 animate-fade-in relative z-10">
-          <div className="mb-4 relative">
-            <img src={logo} alt="Prayer Portal" className="w-72 h-72 object-contain" />
+          <div className="mb-1 relative">
+            <img src={logo} alt="Prayer Portal" className="w-80 h-80 object-contain" />
           </div>
-          <p className="text-base text-center mb-3 leading-relaxed max-w-xs" style={{ color: '#5a7a5a' }}>
+          <p className="text-base text-center mb-3 leading-relaxed max-w-xs" style={{ color: '#d4e8a0' }}>
             Share your heart. Lift each other up.<br/>Experience God's faithfulness together.
           </p>
           <div className="flex flex-wrap justify-center gap-2 mb-10">
