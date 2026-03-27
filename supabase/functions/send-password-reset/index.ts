@@ -65,9 +65,10 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const appUrl = Deno.env.get("APP_URL") || "https://tygjsvkeqgjozrngtucx.supabase.co";
     const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
       targetUser.user.email,
-      { redirectTo: `${Deno.env.get("SUPABASE_URL")?.replace("supabase.co", "supabase.co")}/auth/v1/callback` }
+      { redirectTo: `${appUrl}/update-password` }
     );
 
     if (resetError) {
