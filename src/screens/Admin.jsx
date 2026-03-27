@@ -69,6 +69,12 @@ function UserProfileModal({ userId, currentUserId, onClose }) {
 
             <div className="p-4 rounded-2xl space-y-3" style={{ background: '#0d0d0d' }}>
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#a89060' }}>Contact Info</p>
+              {profile.email && (
+                <div className="flex items-center gap-2 text-sm" style={{ color: '#c8b99a' }}>
+                  <Mail size={13} style={{ color: '#a89060' }} />
+                  <span className="truncate">{profile.email}</span>
+                </div>
+              )}
               {profile.phone ? (
                 <div className="flex items-center gap-2 text-sm" style={{ color: '#c8b99a' }}>
                   <Phone size={13} style={{ color: '#a89060' }} />
