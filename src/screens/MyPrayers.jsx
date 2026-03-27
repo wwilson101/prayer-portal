@@ -26,7 +26,7 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-2xl font-bold gradient-text">My Prayers</h1>
-          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
         </div>
         <p className="text-sm mb-4" style={{ color: '#c8b99a' }}>Your personal prayer journey</p>
 

@@ -36,7 +36,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
               Saved!
             </span>
           )}
-          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
           </div>
         </div>
       </div>

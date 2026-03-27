@@ -34,7 +34,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
             <p className="text-xs font-medium" style={{ color: '#a89060' }}>Good to see you,</p>
             <h1 className="text-2xl font-bold gradient-text">{user.name.split(' ')[0]}</h1>
           </div>
-          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
         </div>
 
         <div className="flex gap-3 mb-4">

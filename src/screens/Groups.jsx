@@ -306,7 +306,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-2xl font-bold gradient-text">Groups</h1>
-          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
         </div>
         <p className="text-sm" style={{ color: '#c8b99a' }}>Your prayer communities</p>
       </div>
