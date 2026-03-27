@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen } from 'lucide-react'
-import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup } from '../lib/admin'
+import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser } from '../lib/admin'
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers'
 
 function SectionHeader({ title, count, expanded, onToggle }) {
@@ -90,6 +90,32 @@ export default function Admin({ currentUserId }) {
     }
   }
 
+  const handleDeletePrayer = async (prayerId, prayerTitle) => {
+    if (!confirm(`Delete prayer "${prayerTitle}"? This cannot be undone.`)) return
+    setActionLoading(`prayer-${prayerId}`)
+    try {
+      await adminDeletePrayer(prayerId)
+      setPrayers(prev => prev.filter(p => p.id !== prayerId))
+    } catch (err) {
+      setError('Failed to delete prayer.')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!confirm(`Remove account for "${userName}"? This will delete their profile. This cannot be undone.`)) return
+    setActionLoading(`delete-user-${userId}`)
+    try {
+      await adminDeleteUser(userId)
+      setUsers(prev => prev.filter(u => u.id !== userId))
+    } catch (err) {
+      setError('Failed to remove account.')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
@@ -164,17 +190,26 @@ export default function Admin({ currentUserId }) {
                         <p className="text-xs text-slate-400">Joined {formatDate(u.created_at)}</p>
                       </div>
                       {u.id !== currentUserId && (
-                        <button
-                          onClick={() => handleToggleAdmin(u.id, u.is_admin)}
-                          disabled={actionLoading === `admin-${u.id}`}
-                          className={`text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-colors flex-shrink-0 disabled:opacity-50 ${
-                            u.is_admin
-                              ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                          }`}
-                        >
-                          {u.is_admin ? 'Revoke Admin' : 'Make Admin'}
-                        </button>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <button
+                            onClick={() => handleToggleAdmin(u.id, u.is_admin)}
+                            disabled={actionLoading === `admin-${u.id}`}
+                            className={`text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
+                              u.is_admin
+                                ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                            }`}
+                          >
+                            {u.is_admin ? 'Revoke Admin' : 'Make Admin'}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.name)}
+                            disabled={actionLoading === `delete-user-${u.id}`}
+                            className="w-7 h-7 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -256,6 +291,13 @@ export default function Admin({ currentUserId }) {
                         }`}>
                           {p.status}
                         </span>
+                        <button
+                          onClick={() => handleDeletePrayer(p.id, p.title)}
+                          disabled={actionLoading === `prayer-${p.id}`}
+                          className="w-7 h-7 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50 flex-shrink-0"
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </div>
                       <p className="text-xs text-slate-400">By {p.ownerName} · {formatDate(p.requestDate)}</p>
                       <p className="text-xs text-slate-500 mt-1 line-clamp-2">{p.request}</p>

@@ -80,3 +80,19 @@ export const adminRemoveUserFromGroup = async (groupId, userId) => {
     .eq('user_id', userId)
   if (error) throw error
 }
+
+export const adminDeletePrayer = async (prayerId) => {
+  const { error } = await supabase
+    .from('prayers')
+    .delete()
+    .eq('id', prayerId)
+  if (error) throw error
+}
+
+export const adminDeleteUser = async (userId) => {
+  const { error } = await supabase
+    .from('profiles')
+    .delete()
+    .eq('id', userId)
+  if (error) throw error
+}
