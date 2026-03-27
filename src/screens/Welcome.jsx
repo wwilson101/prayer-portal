@@ -62,14 +62,13 @@ export default function Welcome({ onAuthSuccess }) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#111211' }}>
         <div className="flex-1 flex flex-col items-center justify-center px-8 animate-fade-in relative z-10">
-          <div className="mb-8 relative">
-            <img src={logo} alt="Prayer Portal" className="w-52 h-52 object-contain" />
+          <div className="mb-4 relative">
+            <img src={logo} alt="Prayer Portal" className="w-72 h-72 object-contain" />
           </div>
-          <h1 className="text-4xl font-bold gradient-text mb-2">Prayer Portal</h1>
           <p className="text-base text-center mb-3 leading-relaxed max-w-xs" style={{ color: '#5a7a5a' }}>
             Share your heart. Lift each other up.<br/>Experience God's faithfulness together.
           </p>
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
             {['Private Groups', 'Prayer Feed', 'Track Answered Prayer'].map(f => (
               <span key={f} className="text-xs px-3 py-1.5 rounded-full glass-card-purple font-medium border" style={{ color: '#6ee75a', borderColor: '#2d5a2d' }}>{f}</span>
             ))}
