@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Wand2, ChevronRight, Users } from 'lucide-react';
+import { X, Wand as Wand2, ChevronRight, Users, CircleAlert as AlertCircle } from 'lucide-react';
 import { generatePrayerTitle } from '../utils/helpers';
 
 export default function AddPrayer({ user, groups, onSave, onClose }) {
@@ -12,6 +12,7 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
   const [titlePreview, setTitlePreview] = useState('');
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const handleRequestChange = (val) => {
     setForm(f => ({ ...f, request: val }));
@@ -36,14 +37,17 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
 
     setSaving(true);
-    setTimeout(() => {
-      onSave({
+    setSaveError('');
+    try {
+      await onSave({
         request: form.request.trim(),
         title: generatePrayerTitle(form.request),
         groupIds: form.selectedGroups,
       });
+    } catch (err) {
+      setSaveError('Failed to share your prayer request. Please try again.');
       setSaving(false);
-    }, 400);
+    }
   };
 
   return (
@@ -160,6 +164,12 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
 
         {/* Submit button */}
         <div className="sticky bottom-0 px-5 py-4 bg-gradient-to-t from-violet-50/80 to-transparent">
+          {saveError && (
+            <div className="flex items-center gap-2 mb-3 px-3 py-2.5 rounded-xl bg-red-50 border border-red-200">
+              <AlertCircle size={14} className="text-red-500 flex-shrink-0" />
+              <p className="text-xs text-red-600">{saveError}</p>
+            </div>
+          )}
           <button
             onClick={handleSave}
             disabled={saving}

@@ -141,6 +141,7 @@ export default function App() {
       setActiveTab('home')
     } catch (err) {
       console.error('Failed to add prayer:', err)
+      throw err
     }
   }
 
