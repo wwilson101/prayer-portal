@@ -65,7 +65,7 @@ export default function Welcome({ onAuthSuccess }) {
           <div className="mb-1 relative">
             <img src={logo} alt="Prayer Portal" className="w-80 h-80 object-contain" />
           </div>
-          <p className="text-base text-center mb-3 leading-relaxed max-w-xs" style={{ color: '#d4e8a0' }}>
+          <p className="text-base text-center mb-3 leading-relaxed max-w-xs" style={{ color: '#f0ede0' }}>
             Share your heart. Lift each other up.<br/>Experience God's faithfulness together.
           </p>
           <div className="flex flex-wrap justify-center gap-2 mb-10">
