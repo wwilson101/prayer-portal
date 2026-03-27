@@ -13,7 +13,7 @@ import BottomNav from './components/BottomNav'
 
 import { onAuthStateChange, signOut } from './lib/auth'
 import { supabase } from './lib/supabase'
-import { getMyProfile, updateProfile } from './lib/profile'
+import { getMyProfile, updateProfile, updateEmail } from './lib/profile'
 import { getMyGroups, createGroup, joinGroupByCode, leaveGroup } from './lib/groups'
 import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotification } from './lib/prayers'
 
@@ -195,12 +195,17 @@ export default function App() {
   const handleUpdateUser = async (data) => {
     try {
       await updateProfile({ name: data.name, phone: data.phone })
+      const emailChanged = data.email && data.email.trim().toLowerCase() !== user.email?.toLowerCase()
+      if (emailChanged) {
+        await updateEmail(data.email.trim())
+      }
       setUser(prev => ({ ...prev, ...data }))
       if (data.name) {
         setPrayers(prev => prev.map(p =>
           p.ownerId === user.id ? { ...p, ownerName: data.name } : p
         ))
       }
+      return { emailChanged }
     } catch (err) {
       console.error('Failed to update profile:', err)
       throw err

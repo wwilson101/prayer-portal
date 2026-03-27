@@ -7,6 +7,8 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: user.name, email: user.email, phone: user.phone || '' });
   const [saved, setSaved] = useState(false);
+  const [emailPending, setEmailPending] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const myPrayers = prayers.filter(p => p.ownerId === user.id);
   const answeredPrayers = myPrayers.filter(p => p.status === 'answered');
@@ -16,12 +18,22 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const initials = getInitials(user.name);
   const avatarColor = getAvatarColor(user.name);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim() || !form.email.trim()) return;
-    onUpdateUser({ name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() });
-    setEditing(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaveError('');
+    try {
+      const result = await onUpdateUser({ name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() });
+      setEditing(false);
+      if (result?.emailChanged) {
+        setEmailPending(true);
+        setTimeout(() => setEmailPending(false), 6000);
+      } else {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save. Please try again.');
+    }
   };
 
   return (
@@ -34,6 +46,12 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
             <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>
               <Check size={12} />
               Saved!
+            </span>
+          )}
+          {emailPending && (
+            <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2010', color: '#e8a040', borderColor: '#5a3a10' }}>
+              <Mail size={12} />
+              Check your email
             </span>
           )}
           <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
@@ -88,6 +106,12 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
                     placeholder="Email"
                   />
                 </div>
+                {form.email.trim().toLowerCase() !== user.email?.toLowerCase() && form.email.trim() && (
+                  <p className="text-xs pl-5" style={{ color: '#e8a040' }}>A confirmation link will be sent to the new email address.</p>
+                )}
+                {saveError && (
+                  <p className="text-xs pl-5 text-red-400">{saveError}</p>
+                )}
                 <div className="flex items-center gap-2">
                   <Phone size={14} className="flex-shrink-0" style={{ color: '#a89060' }} />
                   <input
