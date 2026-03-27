@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, Search, ListFilter as Filter, Sparkles } from 'lucide-react';
+import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 
@@ -33,12 +34,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
             <p className="text-xs font-medium" style={{ color: '#a89060' }}>Good to see you,</p>
             <h1 className="text-2xl font-bold gradient-text">{user.name.split(' ')[0]}</h1>
           </div>
-          <div className="w-10 h-10 rounded-full gradient-bg-deep flex items-center justify-center shadow-md">
-            <svg width="16" height="20" viewBox="0 0 52 60" fill="none">
-              <rect x="22" y="0" width="8" height="60" rx="4" fill="white"/>
-              <rect x="8" y="12" width="36" height="8" rx="4" fill="white"/>
-            </svg>
-          </div>
+          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
         </div>
 
         <div className="flex gap-3 mb-4">
@@ -88,12 +84,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
       <div className="flex-1 px-4 pt-4 space-y-3">
         {visiblePrayers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
-            <div className="w-20 h-20 rounded-3xl gradient-bg flex items-center justify-center mb-4 shadow-lg">
-              <svg width="28" height="32" viewBox="0 0 52 60" fill="none">
-                <rect x="22" y="0" width="8" height="60" rx="4" fill="white" opacity="0.9"/>
-                <rect x="8" y="12" width="36" height="8" rx="4" fill="white" opacity="0.9"/>
-              </svg>
-            </div>
+            <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain mb-4" />
             {myGroupIds.length === 0 ? (
               <>
                 <p className="text-base font-semibold mb-1" style={{ color: '#f0ede0' }}>Join a group first</p>

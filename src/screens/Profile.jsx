@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut } from 'lucide-react';
+import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {
@@ -28,12 +29,15 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
       <div className="header-bg px-5 pt-14 pb-6 sticky top-0 z-30">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold gradient-text">Profile</h1>
+          <div className="flex items-center gap-2">
           {saved && (
             <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>
               <Check size={12} />
               Saved!
             </span>
           )}
+          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+          </div>
         </div>
       </div>
 
@@ -146,12 +150,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         </div>
 
         <div className="glass-card-purple rounded-xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl gradient-bg-deep flex items-center justify-center shadow-md">
-            <svg width="16" height="20" viewBox="0 0 52 60" fill="none">
-              <rect x="22" y="0" width="8" height="60" rx="4" fill="white"/>
-              <rect x="8" y="12" width="36" height="8" rx="4" fill="white"/>
-            </svg>
-          </div>
+          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
           <div>
             <p className="text-sm font-bold" style={{ color: '#f0ede0' }}>Prayer Portal</p>
             <p className="text-xs" style={{ color: '#c8b99a' }}>Version 1.0 · Built with love & faith</p>

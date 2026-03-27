@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, CircleCheck as CheckCircle2, Clock, Sparkles } from 'lucide-react';
+import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 import MarkAnsweredModal from '../components/MarkAnsweredModal';
@@ -23,7 +24,10 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
-        <h1 className="text-2xl font-bold gradient-text mb-1">My Prayers</h1>
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-2xl font-bold gradient-text">My Prayers</h1>
+          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+        </div>
         <p className="text-sm mb-4" style={{ color: '#c8b99a' }}>Your personal prayer journey</p>
 
         <div className="grid grid-cols-3 gap-2 mb-4">
@@ -68,12 +72,7 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
       <div className="flex-1 px-4 pt-4 space-y-3">
         {myPrayers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
-            <div className="w-20 h-20 rounded-3xl gradient-bg flex items-center justify-center mb-4 shadow-lg">
-              <svg width="28" height="32" viewBox="0 0 52 60" fill="none">
-                <rect x="22" y="0" width="8" height="60" rx="4" fill="white" opacity="0.9"/>
-                <rect x="8" y="12" width="36" height="8" rx="4" fill="white" opacity="0.9"/>
-              </svg>
-            </div>
+            <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain mb-4" />
             <p className="text-base font-semibold mb-1" style={{ color: '#f0ede0' }}>
               {filter !== 'all' ? `No ${filter} prayers` : 'No prayers yet'}
             </p>

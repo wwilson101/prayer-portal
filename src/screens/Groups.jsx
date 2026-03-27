@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock } from 'lucide-react';
+import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import { generateId, generateGroupCode, getInitials, getAvatarColor, formatDate } from '../utils/helpers';
 
 function GroupCard({ group, userId, onClick }) {
@@ -303,7 +304,10 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
-        <h1 className="text-2xl font-bold gradient-text mb-1">Groups</h1>
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-2xl font-bold gradient-text">Groups</h1>
+          <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
+        </div>
         <p className="text-sm" style={{ color: '#c8b99a' }}>Your prayer communities</p>
       </div>
 
