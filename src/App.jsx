@@ -6,6 +6,7 @@ import Home from './screens/Home'
 import MyPrayers from './screens/MyPrayers'
 import Groups from './screens/Groups'
 import Profile from './screens/Profile'
+import Admin from './screens/Admin'
 import AddPrayer from './screens/AddPrayer'
 import BottomNav from './components/BottomNav'
 
@@ -236,8 +237,11 @@ export default function App() {
           onLogout={handleLogout}
         />
       )}
+      {activeTab === 'admin' && user?.isAdmin && (
+        <Admin currentUserId={user.id} />
+      )}
 
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} isAdmin={!!user?.isAdmin} />
 
       {showAddPrayer && (
         <AddPrayer
