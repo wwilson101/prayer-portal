@@ -13,7 +13,7 @@ import BottomNav from './components/BottomNav'
 import { onAuthStateChange, signOut } from './lib/auth'
 import { getMyProfile, updateProfile } from './lib/profile'
 import { getMyGroups, createGroup, joinGroupByCode, leaveGroup } from './lib/groups'
-import { getPrayers, addPrayer, markAnswered, addPray, removePray } from './lib/prayers'
+import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotification } from './lib/prayers'
 
 function Splash() {
   return (
@@ -97,6 +97,16 @@ export default function App() {
         await removePray(prayerId, user.id)
       } else {
         await addPray(prayerId, user.id)
+        if (prayer.notifyOnPray && prayer.ownerId !== user.id) {
+          sendPrayNotification({
+            prayerId: prayer.id,
+            prayerOwnerId: prayer.ownerId,
+            prayerOwnerPhone: prayer.ownerPhone,
+            prayerOwnerName: prayer.ownerName,
+            prayerTitle: prayer.title,
+            prayerByName: user.name,
+          })
+        }
       }
     } catch (err) {
       console.error('Failed to update pray:', err)
@@ -135,6 +145,7 @@ export default function App() {
         userId: user.id,
         userName: user.name,
         userPhone: user.phone,
+        notifyOnPray: data.notifyOnPray || false,
       })
       setPrayers(prev => [newPrayer, ...prev])
       setShowAddPrayer(false)

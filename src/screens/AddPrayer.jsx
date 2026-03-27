@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Wand as Wand2, ChevronRight, Users, CircleAlert as AlertCircle } from 'lucide-react';
+import { X, Wand as Wand2, ChevronRight, Users, CircleAlert as AlertCircle, Bell, BellOff } from 'lucide-react';
 import { generatePrayerTitle } from '../utils/helpers';
 
 export default function AddPrayer({ user, groups, onSave, onClose }) {
@@ -8,6 +8,7 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
   const [form, setForm] = useState({
     request: '',
     selectedGroups: myGroups.length > 0 ? [myGroups[0].id] : [],
+    notifyOnPray: false,
   });
   const [titlePreview, setTitlePreview] = useState('');
   const [errors, setErrors] = useState({});
@@ -43,6 +44,7 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
         request: form.request.trim(),
         title: generatePrayerTitle(form.request),
         groupIds: form.selectedGroups,
+        notifyOnPray: form.notifyOnPray,
       });
     } catch (err) {
       setSaveError('Failed to share your prayer request. Please try again.');
@@ -160,6 +162,43 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
               Your request will only be visible to members of your selected groups.
             </p>
           </div>
+
+          {/* Notify on pray toggle */}
+          <button
+            type="button"
+            onClick={() => setForm(f => ({ ...f, notifyOnPray: !f.notifyOnPray }))}
+            className={`w-full rounded-xl p-4 flex items-center gap-3 transition-all duration-200 text-left ${
+              form.notifyOnPray
+                ? 'bg-emerald-50 border border-emerald-200'
+                : 'glass-card border border-transparent'
+            }`}
+          >
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
+              form.notifyOnPray ? 'bg-emerald-100' : 'bg-slate-100'
+            }`}>
+              {form.notifyOnPray
+                ? <Bell size={16} className="text-emerald-600" />
+                : <BellOff size={16} className="text-slate-400" />
+              }
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-semibold ${form.notifyOnPray ? 'text-emerald-800' : 'text-slate-600'}`}>
+                Text me when someone prays
+              </p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {form.notifyOnPray
+                  ? 'You\'ll get a text each time someone new prays for this'
+                  : 'Tap to receive a text notification when others pray'}
+              </p>
+            </div>
+            <div className={`w-11 h-6 rounded-full transition-all duration-200 flex-shrink-0 relative ${
+              form.notifyOnPray ? 'bg-emerald-500' : 'bg-slate-200'
+            }`}>
+              <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-200 ${
+                form.notifyOnPray ? 'left-5' : 'left-0.5'
+              }`} />
+            </div>
+          </button>
         </div>
 
         {/* Submit button */}

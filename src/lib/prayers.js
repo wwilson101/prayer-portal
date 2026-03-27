@@ -1,10 +1,8 @@
 import { supabase } from './supabase'
 
-// Fetch all prayers visible to the current user across their groups
 export const getPrayers = async (myGroupIds) => {
   if (!myGroupIds.length) return []
 
-  // Get all prayer IDs shared into the user's groups
   const { data: pgRows, error: pgError } = await supabase
     .from('prayer_groups')
     .select('prayer_id, group_id')
@@ -15,7 +13,6 @@ export const getPrayers = async (myGroupIds) => {
 
   const prayerIds = [...new Set(pgRows.map(r => r.prayer_id))]
 
-  // Fetch prayers + owner profile in one go
   const { data: prayers, error: pError } = await supabase
     .from('prayers')
     .select('*, profiles!prayers_owner_id_fkey(name, phone)')
@@ -24,7 +21,6 @@ export const getPrayers = async (myGroupIds) => {
 
   if (pError) throw pError
 
-  // Fetch who's praying for each
   const { data: prays, error: praysError } = await supabase
     .from('prayer_prays')
     .select('prayer_id, user_id')
@@ -32,7 +28,6 @@ export const getPrayers = async (myGroupIds) => {
 
   if (praysError) throw praysError
 
-  // Build lookup maps
   const groupMap = {}
   pgRows.forEach(r => {
     if (!groupMap[r.prayer_id]) groupMap[r.prayer_id] = []
@@ -56,19 +51,20 @@ export const getPrayers = async (myGroupIds) => {
     ownerId: p.owner_id,
     ownerName: p.profiles?.name || 'Unknown',
     ownerPhone: p.profiles?.phone || '',
-    // Email intentionally omitted — shown only to owner who has it from session
     ownerEmail: '',
+    notifyOnPray: p.notify_on_pray || false,
     groupIds: groupMap[p.id] || [],
     prayedBy: praysMap[p.id] || [],
   }))
 }
 
-export const addPrayer = async ({ title, request, groupIds, userId, userName, userPhone }) => {
+export const addPrayer = async ({ title, request, groupIds, userId, userName, userPhone, notifyOnPray = false }) => {
   const { data: prayer, error } = await supabase
     .rpc('add_prayer_with_groups', {
       p_title: title,
       p_request: request,
       p_group_ids: groupIds,
+      p_notify_on_pray: notifyOnPray,
     })
 
   if (error) throw error
@@ -85,6 +81,7 @@ export const addPrayer = async ({ title, request, groupIds, userId, userName, us
     ownerName: userName,
     ownerEmail: '',
     ownerPhone: userPhone || '',
+    notifyOnPray: prayer.notify_on_pray || false,
     groupIds,
     prayedBy: [],
   }
@@ -101,13 +98,18 @@ export const markAnswered = async (prayerId, note = '') => {
     .eq('id', prayerId)
 
   if (error) throw error
+
+  await supabase
+    .from('prayer_notifications_sent')
+    .delete()
+    .eq('prayer_id', prayerId)
 }
 
 export const addPray = async (prayerId, userId) => {
   const { error } = await supabase
     .from('prayer_prays')
     .insert({ prayer_id: prayerId, user_id: userId })
-  if (error && error.code !== '23505') throw error // ignore duplicate key
+  if (error && error.code !== '23505') throw error
 }
 
 export const removePray = async (prayerId, userId) => {
@@ -117,4 +119,26 @@ export const removePray = async (prayerId, userId) => {
     .eq('prayer_id', prayerId)
     .eq('user_id', userId)
   if (error) throw error
+}
+
+export const sendPrayNotification = async ({ prayerId, prayerOwnerId, prayerOwnerPhone, prayerOwnerName, prayerTitle, prayerByName }) => {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return
+
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+  try {
+    await fetch(`${supabaseUrl}/functions/v1/send-pray-notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+        'Apikey': anonKey,
+      },
+      body: JSON.stringify({ prayerId, prayerOwnerId, prayerOwnerPhone, prayerOwnerName, prayerTitle, prayerByName }),
+    })
+  } catch (err) {
+    console.error('Failed to send pray notification:', err)
+  }
 }
