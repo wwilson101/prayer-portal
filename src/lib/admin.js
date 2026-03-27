@@ -1,5 +1,24 @@
 import { supabase } from './supabase'
 
+export const adminSendPasswordReset = async (userId) => {
+  const { data: { session } } = await supabase.auth.getSession()
+  const response = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-password-reset`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`,
+        'Apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ userId }),
+    }
+  )
+  const result = await response.json()
+  if (!response.ok) throw new Error(result.error || 'Failed to send reset email')
+  return result
+}
+
 export const adminGetAllUsers = async () => {
   const { data, error } = await supabase
     .from('profiles')

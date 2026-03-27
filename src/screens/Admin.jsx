@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen } from 'lucide-react'
-import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser } from '../lib/admin'
+import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen, Mail } from 'lucide-react'
+import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser, adminSendPasswordReset } from '../lib/admin'
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers'
 
 function SectionHeader({ title, count, expanded, onToggle }) {
@@ -119,6 +119,19 @@ export default function Admin({ currentUserId }) {
     }
   }
 
+  const handlePasswordReset = async (userId, userName) => {
+    if (!confirm(`Send a password reset email to ${userName}?`)) return
+    setActionLoading(`reset-${userId}`)
+    try {
+      await adminSendPasswordReset(userId)
+      setError('')
+    } catch (err) {
+      setError(`Failed to send reset email: ${err.message}`)
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
@@ -203,6 +216,15 @@ export default function Admin({ currentUserId }) {
                             }
                           >
                             {u.is_admin ? 'Revoke Admin' : 'Make Admin'}
+                          </button>
+                          <button
+                            onClick={() => handlePasswordReset(u.id, u.name)}
+                            disabled={actionLoading === `reset-${u.id}`}
+                            title="Send password reset email"
+                            className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50"
+                            style={{ background: '#111827', color: '#7dd3fc' }}
+                          >
+                            <Mail size={13} />
                           </button>
                           <button
                             onClick={() => handleDeleteUser(u.id, u.name)}
