@@ -293,6 +293,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
   const [showJoin, setShowJoin] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
+  const isAdmin = !!user?.isAdmin;
   const myGroups = groups.filter(g => g.members.some(m => m.id === user.id));
 
   return (
@@ -305,16 +306,18 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
 
       {/* Action buttons */}
       <div className="px-5 pt-4 flex gap-3">
-        <button
-          onClick={() => setShowCreate(true)}
-          className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 text-sm"
-        >
-          <Plus size={16} />
-          Create Group
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 text-sm"
+          >
+            <Plus size={16} />
+            Create Group
+          </button>
+        )}
         <button
           onClick={() => setShowJoin(true)}
-          className="btn-ghost flex-1 flex items-center justify-center gap-2 text-sm"
+          className={`btn-ghost flex items-center justify-center gap-2 text-sm py-3 ${isAdmin ? 'flex-1' : 'w-full'}`}
         >
           <LogIn size={16} />
           Join Group
