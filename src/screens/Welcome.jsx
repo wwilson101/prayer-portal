@@ -92,9 +92,7 @@ export default function Welcome({ onAuthSuccess }) {
             <ArrowLeft size={16} /> Back
           </button>
           <div className="mb-8">
-            <div className="w-16 h-16 rounded-2xl gradient-bg-deep flex items-center justify-center mb-5 shadow-lg">
-              <img src={logo} alt="Prayer Portal" className="w-16 h-16 object-contain mb-4" />
-            </div>
+            <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain mb-5" />
             <h2 className="text-2xl font-bold mb-1" style={{ color: '#d4e8a0' }}>Create your account</h2>
             <p className="text-sm" style={{ color: '#5a7a5a' }}>Join your prayer community</p>
           </div>
