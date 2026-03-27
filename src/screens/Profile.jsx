@@ -151,10 +151,18 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
 
         <div className="glass-card-purple rounded-xl p-4 flex items-center gap-3">
           <img src={logo} alt="Prayer Portal" className="w-10 h-10 object-contain" />
-          <div>
+          <div className="flex-1">
             <p className="text-sm font-bold" style={{ color: '#f0ede0' }}>Prayer Portal</p>
             <p className="text-xs" style={{ color: '#c8b99a' }}>Version 1.0 · Built with love & faith</p>
           </div>
+          <a
+            href="mailto:wwilson101@gmail.com?subject=Prayer Portal Support"
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-opacity hover:opacity-80"
+            style={{ background: '#111111', color: '#a89060' }}
+          >
+            <Mail size={12} />
+            Support
+          </a>
         </div>
 
         <button
