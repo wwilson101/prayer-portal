@@ -19,7 +19,7 @@ import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotif
 
 function Splash() {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#111211' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#000000' }}>
       <div className="flex flex-col items-center gap-4 animate-pulse-soft">
         <img src={logo} alt="Prayer Portal" className="w-24 h-24 object-contain" />
         <p className="gradient-text font-bold text-xl">Prayer Portal</p>
@@ -216,7 +216,7 @@ export default function App() {
   const screenProps = { user, prayers, groups }
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#111211' }}>
+    <div className="relative min-h-screen" style={{ background: '#000000' }}>
       {activeTab === 'home' && (
         <Home
           {...screenProps}

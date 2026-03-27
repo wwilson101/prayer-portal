@@ -22,36 +22,33 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      {/* Header */}
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
         <h1 className="text-2xl font-bold gradient-text mb-1">My Prayers</h1>
-        <p className="text-sm mb-4" style={{ color: '#5a7a5a' }}>Your personal prayer journey</p>
+        <p className="text-sm mb-4" style={{ color: '#c8b99a' }}>Your personal prayer journey</p>
 
-        {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="glass-card-blue rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold" style={{ color: '#6ee75a' }}>{activeCount}</p>
-            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#5aaa5a' }}>
+            <p className="text-2xl font-bold" style={{ color: '#f0ede0' }}>{activeCount}</p>
+            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#c8b99a' }}>
               <Clock size={9} />
               Active
             </p>
           </div>
           <div className="glass-card-purple rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold" style={{ color: '#6ee75a' }}>{answeredCount}</p>
-            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#5aaa5a' }}>
+            <p className="text-2xl font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</p>
+            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#c8b99a' }}>
               <Sparkles size={9} />
               Answered
             </p>
           </div>
           <div className="glass-card rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold" style={{ color: '#6ee75a' }}>{totalPraying}</p>
-            <p className="text-[10px] font-medium mt-0.5" style={{ color: '#5aaa5a' }}>Praying</p>
+            <p className="text-2xl font-bold" style={{ color: '#f0ede0' }}>{totalPraying}</p>
+            <p className="text-[10px] font-medium mt-0.5" style={{ color: '#c8b99a' }}>Praying</p>
           </div>
         </div>
 
-        {/* Filter tabs */}
         <div className="flex gap-2">
-          {[['all', 'All'], ['active', 'Active'], ['answered', 'Answered ✨']].map(([val, label]) => (
+          {[['all', 'All'], ['active', 'Active'], ['answered', 'Answered']].map(([val, label]) => (
             <button
               key={val}
               onClick={() => setFilter(val)}
@@ -60,7 +57,7 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
                   ? 'gradient-bg-deep text-white shadow-sm'
                   : 'border'
               }`}
-              style={filter !== val ? { background: '#1a2a1a', color: '#5a7a5a', borderColor: '#2a3a2a' } : {}}
+              style={filter !== val ? { background: '#111111', color: '#c8b99a', borderColor: '#2a2520' } : {}}
             >
               {label}
             </button>
@@ -68,7 +65,6 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
         </div>
       </div>
 
-      {/* Prayer list */}
       <div className="flex-1 px-4 pt-4 space-y-3">
         {myPrayers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
@@ -78,10 +74,10 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
                 <rect x="8" y="12" width="36" height="8" rx="4" fill="white" opacity="0.9"/>
               </svg>
             </div>
-            <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>
+            <p className="text-base font-semibold mb-1" style={{ color: '#f0ede0' }}>
               {filter !== 'all' ? `No ${filter} prayers` : 'No prayers yet'}
             </p>
-            <p className="text-sm max-w-xs mb-6" style={{ color: '#5a7a5a' }}>
+            <p className="text-sm max-w-xs mb-6" style={{ color: '#c8b99a' }}>
               {filter !== 'all' ? 'Try changing the filter above.' : 'Share your first prayer request with your group.'}
             </p>
             {filter === 'all' && (
@@ -105,7 +101,7 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
                 <button
                   onClick={() => setMarkingAnswered(prayer)}
                   className="absolute top-3 right-3 text-[11px] border px-2.5 py-1 rounded-full font-medium flex items-center gap-1 hover:opacity-80 transition-colors z-10"
-                  style={{ background: '#0f2a0f', color: '#6ee75a', borderColor: '#2d5a2d' }}
+                  style={{ background: '#0f1e14', color: '#a89060', borderColor: '#2d5a3d' }}
                 >
                   <CheckCircle2 size={11} />
                   Answered?
@@ -116,7 +112,6 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
         )}
       </div>
 
-      {/* FAB */}
       <button
         onClick={onAddPrayer}
         className="floating-btn fixed bottom-24 w-14 h-14 rounded-2xl flex items-center justify-center z-30"
@@ -125,7 +120,6 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
         <Plus size={26} className="text-white" />
       </button>
 
-      {/* Prayer detail modal */}
       {selectedPrayer && (
         <PrayerDetail
           prayer={selectedPrayer}
@@ -137,7 +131,6 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
         />
       )}
 
-      {/* Mark answered modal */}
       {markingAnswered && (
         <MarkAnsweredModal
           prayer={markingAnswered}

@@ -31,8 +31,8 @@ export default function BottomNav({ activeTab, onTabChange, isAdmin }) {
                 className="transition-all duration-200"
                 style={{
                   color: active
-                    ? isAdminTab ? '#d4a050' : '#6ee75a'
-                    : '#4a5e4a',
+                    ? isAdminTab ? '#a89060' : '#a89060'
+                    : '#4a4030',
                   strokeWidth: active ? 2.5 : 1.5,
                 }}
               />
@@ -40,8 +40,8 @@ export default function BottomNav({ activeTab, onTabChange, isAdmin }) {
                 className="text-[10px] font-medium transition-all duration-200"
                 style={{
                   color: active
-                    ? isAdminTab ? '#d4a050' : '#6ee75a'
-                    : '#4a5e4a',
+                    ? isAdminTab ? '#a89060' : '#a89060'
+                    : '#4a4030',
                 }}
               >
                 {label}

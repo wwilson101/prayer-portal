@@ -9,30 +9,27 @@ export default function MarkAnsweredModal({ prayer, onConfirm, onClose }) {
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full" style={{ background: '#2d5a2d' }} />
+          <div className="w-10 h-1 rounded-full" style={{ background: '#2d5a3d' }} />
         </div>
 
         <div className="px-5 pb-8 pt-4">
-          {/* Icon */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: '#1a3a1a' }}>
-              <Sparkles size={22} style={{ color: '#6ee75a' }} />
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: '#1a2e22' }}>
+              <Sparkles size={22} style={{ color: '#a89060' }} />
             </div>
             <div>
-              <h3 className="text-lg font-bold" style={{ color: '#d4e8a0' }}>Praise God!</h3>
-              <p className="text-sm" style={{ color: '#5a7a5a' }}>Mark this prayer as answered</p>
+              <h3 className="text-lg font-bold" style={{ color: '#f0ede0' }}>Praise God!</h3>
+              <p className="text-sm" style={{ color: '#c8b99a' }}>Mark this prayer as answered</p>
             </div>
           </div>
 
-          {/* Prayer title */}
           <div className="glass-card rounded-xl p-3 mb-4">
-            <p className="text-sm font-medium line-clamp-2" style={{ color: '#c8e090' }}>{prayer.title}</p>
+            <p className="text-sm font-medium line-clamp-2" style={{ color: '#f0ede0' }}>{prayer.title}</p>
           </div>
 
-          {/* Testimony note */}
           <div className="mb-5">
-            <label className="text-xs font-semibold uppercase tracking-wide mb-2 block" style={{ color: '#7acc7a' }}>
-              Share Your Testimony <span className="normal-case font-normal" style={{ color: '#4a6a4a' }}>(optional)</span>
+            <label className="text-xs font-semibold uppercase tracking-wide mb-2 block" style={{ color: '#a89060' }}>
+              Share Your Testimony <span className="normal-case font-normal" style={{ color: '#c8b99a' }}>(optional)</span>
             </label>
             <textarea
               rows={4}
@@ -43,7 +40,6 @@ export default function MarkAnsweredModal({ prayer, onConfirm, onClose }) {
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-3">
             <button onClick={onClose} className="btn-ghost flex-1">
               Cancel
@@ -51,7 +47,7 @@ export default function MarkAnsweredModal({ prayer, onConfirm, onClose }) {
             <button
               onClick={() => onConfirm(prayer.id, note.trim())}
               className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md"
-              style={{ background: '#6ee75a', color: '#0f2a0f', boxShadow: '0 4px 12px rgba(110,231,90,0.25)' }}
+              style={{ background: '#2d5a3d', color: '#c8b99a', boxShadow: '0 4px 12px rgba(45,90,61,0.4)' }}
             >
               <CheckCircle2 size={16} />
               Mark Answered

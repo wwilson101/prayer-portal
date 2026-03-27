@@ -6,7 +6,7 @@ import PrayerDetail from '../components/PrayerDetail';
 export default function Home({ user, prayers, groups, onPray, onMarkAnswered, onAddPrayer }) {
   const [selectedPrayer, setSelectedPrayer] = useState(null);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('all'); // all, active, answered
+  const [filter, setFilter] = useState('all');
 
   const myGroupIds = groups
     .filter(g => g.members.some(m => m.id === user.id))
@@ -27,11 +27,10 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      {/* Header */}
       <div className="header-bg px-5 pt-14 pb-4 sticky top-0 z-30">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-xs font-medium" style={{ color: '#6ee75a' }}>Good to see you,</p>
+            <p className="text-xs font-medium" style={{ color: '#a89060' }}>Good to see you,</p>
             <h1 className="text-2xl font-bold gradient-text">{user.name.split(' ')[0]}</h1>
           </div>
           <div className="w-10 h-10 rounded-full gradient-bg-deep flex items-center justify-center shadow-md">
@@ -42,24 +41,22 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
           </div>
         </div>
 
-        {/* Stats pills */}
         <div className="flex gap-3 mb-4">
           <div className="glass-card-blue rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-xl font-bold" style={{ color: '#6ee75a' }}>{activeCount}</span>
-            <span className="text-xs font-medium" style={{ color: '#5aaa5a' }}>Active</span>
+            <span className="text-xl font-bold" style={{ color: '#f0ede0' }}>{activeCount}</span>
+            <span className="text-xs font-medium" style={{ color: '#c8b99a' }}>Active</span>
           </div>
           <div className="glass-card-purple rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-xl font-bold" style={{ color: '#6ee75a' }}>{answeredCount}</span>
-            <span className="text-xs font-medium flex items-center gap-1" style={{ color: '#5aaa5a' }}>
+            <span className="text-xl font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</span>
+            <span className="text-xs font-medium flex items-center gap-1" style={{ color: '#c8b99a' }}>
               <Sparkles size={10} />
               Answered
             </span>
           </div>
         </div>
 
-        {/* Search */}
         <div className="relative mb-3">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: '#4a6a4a' }} />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: '#a89060' }} />
           <input
             type="text"
             placeholder="Search prayers..."
@@ -70,7 +67,6 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
           />
         </div>
 
-        {/* Filter tabs */}
         <div className="flex gap-2">
           {[['all', 'All'], ['active', 'Active'], ['answered', 'Answered']].map(([val, label]) => (
             <button
@@ -81,7 +77,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
                   ? 'gradient-bg-deep text-white shadow-sm'
                   : 'border'
               }`}
-              style={filter !== val ? { background: '#1a2a1a', color: '#5a7a5a', borderColor: '#2a3a2a' } : {}}
+              style={filter !== val ? { background: '#111111', color: '#c8b99a', borderColor: '#2a2520' } : {}}
             >
               {label}
             </button>
@@ -89,7 +85,6 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
         </div>
       </div>
 
-      {/* Prayer list */}
       <div className="flex-1 px-4 pt-4 space-y-3">
         {visiblePrayers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
@@ -101,18 +96,18 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
             </div>
             {myGroupIds.length === 0 ? (
               <>
-                <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>Join a group first</p>
-                <p className="text-sm max-w-xs" style={{ color: '#5a7a5a' }}>Join or create a prayer group to see and share prayer requests with others.</p>
+                <p className="text-base font-semibold mb-1" style={{ color: '#f0ede0' }}>Join a group first</p>
+                <p className="text-sm max-w-xs" style={{ color: '#c8b99a' }}>Join or create a prayer group to see and share prayer requests with others.</p>
               </>
             ) : search.trim() ? (
               <>
-                <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>No results found</p>
-                <p className="text-sm" style={{ color: '#5a7a5a' }}>Try a different search term.</p>
+                <p className="text-base font-semibold mb-1" style={{ color: '#f0ede0' }}>No results found</p>
+                <p className="text-sm" style={{ color: '#c8b99a' }}>Try a different search term.</p>
               </>
             ) : (
               <>
-                <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>No prayers yet</p>
-                <p className="text-sm max-w-xs" style={{ color: '#5a7a5a' }}>Be the first to share a prayer request with your group.</p>
+                <p className="text-base font-semibold mb-1" style={{ color: '#f0ede0' }}>No prayers yet</p>
+                <p className="text-sm max-w-xs" style={{ color: '#c8b99a' }}>Be the first to share a prayer request with your group.</p>
               </>
             )}
           </div>
@@ -130,7 +125,6 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
         )}
       </div>
 
-      {/* FAB */}
       <button
         onClick={onAddPrayer}
         className="floating-btn fixed bottom-24 right-5 w-14 h-14 rounded-2xl flex items-center justify-center z-30"
@@ -139,7 +133,6 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
         <Plus size={26} className="text-white" />
       </button>
 
-      {/* Prayer detail modal */}
       {selectedPrayer && (
         <PrayerDetail
           prayer={selectedPrayer}
