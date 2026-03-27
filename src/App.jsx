@@ -21,9 +21,7 @@ function Splash() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#111211' }}>
       <div className="flex flex-col items-center gap-4 animate-pulse-soft">
-        <div className="w-20 h-20 rounded-3xl gradient-bg-deep flex items-center justify-center shadow-xl" style={{ boxShadow: '0 0 24px rgba(110,231,90,0.2)' }}>
-          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
-        </div>
+        <img src={logo} alt="Prayer Portal" className="w-24 h-24 object-contain" />
         <p className="gradient-text font-bold text-xl">Prayer Portal</p>
       </div>
     </div>
