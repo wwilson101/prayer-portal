@@ -8,17 +8,12 @@ import Groups from './screens/Groups'
 import Profile from './screens/Profile'
 import AddPrayer from './screens/AddPrayer'
 import BottomNav from './components/BottomNav'
-import { generateId, generateGroupCode, generatePrayerTitle, createSeedData } from './utils/helpers'
 
-// ── localStorage helpers ─────────────────────────────────────────────────
-const KEYS = { user: 'pp_user', prayers: 'pp_prayers', groups: 'pp_groups' }
+import { onAuthStateChange, signOut } from './lib/auth'
+import { getMyProfile, updateProfile } from './lib/profile'
+import { getMyGroups, createGroup, joinGroupByCode, leaveGroup } from './lib/groups'
+import { getPrayers, addPrayer, markAnswered, addPray, removePray } from './lib/prayers'
 
-const load = (key) => {
-  try { return JSON.parse(localStorage.getItem(key)) } catch { return null }
-}
-const save = (key, data) => localStorage.setItem(key, JSON.stringify(data))
-
-// ── Splash shown while loading ──────────────────────────────────────────
 function Splash() {
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -43,74 +38,52 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [showAddPrayer, setShowAddPrayer] = useState(false)
 
-  // ── Load from localStorage on mount ────────────────────────────────────
-  useEffect(() => {
-    const savedUser = load(KEYS.user)
-    if (savedUser) {
-      setUser(savedUser)
-      setPrayers(load(KEYS.prayers) || [])
-      setGroups(load(KEYS.groups) || [])
+  const loadData = useCallback(async () => {
+    try {
+      const profile = await getMyProfile()
+      if (!profile) return
+      setUser(profile)
+      const myGroups = await getMyGroups()
+      setGroups(myGroups)
+      const groupIds = myGroups.map(g => g.id)
+      const myPrayers = await getPrayers(groupIds)
+      setPrayers(myPrayers)
+    } catch (err) {
+      console.error('Failed to load data:', err)
     }
-    setReady(true)
   }, [])
 
-  // ── Persist whenever data changes ──────────────────────────────────────
   useEffect(() => {
-    if (user) save(KEYS.user, user)
-  }, [user])
+    const unsub = onAuthStateChange((event, session) => {
+      (async () => {
+        if (session) {
+          await loadData()
+        } else {
+          setUser(null)
+          setPrayers([])
+          setGroups([])
+        }
+        setReady(true)
+      })()
+    })
+    return unsub
+  }, [loadData])
 
-  useEffect(() => {
-    if (user) save(KEYS.prayers, prayers)
-  }, [prayers, user])
-
-  useEffect(() => {
-    if (user) save(KEYS.groups, groups)
-  }, [groups, user])
-
-  // ── Auth handlers ──────────────────────────────────────────────────────
-  const handleSignUp = (formData) => {
-    const newUser = {
-      id: generateId(),
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone || '',
-      createdAt: new Date().toISOString(),
-    }
-    // Create seed data for demo
-    const seed = createSeedData(newUser.id, newUser.name, newUser.email, newUser.phone)
-    setUser(newUser)
-    setPrayers(seed.prayers)
-    setGroups(seed.groups)
-    save(KEYS.user, newUser)
-    save(KEYS.prayers, seed.prayers)
-    save(KEYS.groups, seed.groups)
-  }
-
-  const handleSignIn = ({ email }) => {
-    // In localStorage mode, check if a user exists with that email
-    const savedUser = load(KEYS.user)
-    if (savedUser && savedUser.email === email) {
-      setUser(savedUser)
-      setPrayers(load(KEYS.prayers) || [])
-      setGroups(load(KEYS.groups) || [])
-    } else {
-      throw new Error('No account found with that email. Please sign up first.')
-    }
-  }
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut()
     setUser(null)
     setPrayers([])
     setGroups([])
     setActiveTab('home')
   }
 
-  // ── Prayer handlers ────────────────────────────────────────────────────
-  const handlePray = (prayerId) => {
+  const handlePray = async (prayerId) => {
     if (!user) return
+    const prayer = prayers.find(p => p.id === prayerId)
+    if (!prayer) return
+    const hasPrayed = prayer.prayedBy?.includes(user.id)
     setPrayers(prev => prev.map(p => {
       if (p.id !== prayerId) return p
-      const hasPrayed = p.prayedBy?.includes(user.id)
       return {
         ...p,
         prayedBy: hasPrayed
@@ -118,87 +91,114 @@ export default function App() {
           : [...(p.prayedBy || []), user.id],
       }
     }))
+    try {
+      if (hasPrayed) {
+        await removePray(prayerId, user.id)
+      } else {
+        await addPray(prayerId, user.id)
+      }
+    } catch (err) {
+      console.error('Failed to update pray:', err)
+      setPrayers(prev => prev.map(p => {
+        if (p.id !== prayerId) return p
+        return {
+          ...p,
+          prayedBy: hasPrayed
+            ? [...(p.prayedBy || []), user.id]
+            : p.prayedBy.filter(id => id !== user.id),
+        }
+      }))
+    }
   }
 
-  const handleMarkAnswered = (prayerId, note = '') => {
+  const handleMarkAnswered = async (prayerId, note = '') => {
     setPrayers(prev => prev.map(p =>
       p.id === prayerId
         ? { ...p, status: 'answered', answeredDate: new Date().toISOString(), answeredNote: note }
         : p
     ))
-  }
-
-  const handleAddPrayer = (data) => {
-    const newPrayer = {
-      id: generateId(),
-      title: data.title,
-      request: data.request,
-      requestDate: new Date().toISOString(),
-      status: 'active',
-      answeredDate: null,
-      answeredNote: null,
-      ownerId: user.id,
-      ownerName: user.name,
-      ownerEmail: user.email,
-      ownerPhone: user.phone,
-      groupIds: data.groupIds,
-      prayedBy: [],
-    }
-    setPrayers(prev => [newPrayer, ...prev])
-    setShowAddPrayer(false)
-    setActiveTab('home')
-  }
-
-  // ── Group handlers ─────────────────────────────────────────────────────
-  const handleCreateGroup = (data) => {
-    const newGroup = {
-      id: generateId(),
-      name: data.name,
-      description: data.description || '',
-      code: generateGroupCode(),
-      createdBy: user.id,
-      members: [{ id: user.id, name: user.name, email: user.email, joinedAt: new Date().toISOString() }],
-      createdAt: new Date().toISOString(),
-    }
-    setGroups(prev => [...prev, newGroup])
-  }
-
-  const handleJoinGroup = (code) => {
-    const group = groups.find(g => g.code === code)
-    if (!group) return { success: false, message: 'No group found with that code.' }
-    if (group.members.some(m => m.id === user.id)) return { success: false, message: 'You\'re already in this group.' }
-    const updated = {
-      ...group,
-      members: [...group.members, { id: user.id, name: user.name, email: user.email, joinedAt: new Date().toISOString() }],
-    }
-    setGroups(prev => prev.map(g => g.id === group.id ? updated : g))
-    return { success: true }
-  }
-
-  const handleLeaveGroup = (groupId) => {
-    setGroups(prev => prev.map(g =>
-      g.id === groupId
-        ? { ...g, members: g.members.filter(m => m.id !== user.id) }
-        : g
-    ).filter(g => g.members.length > 0))
-  }
-
-  // ── Profile handler ────────────────────────────────────────────────────
-  const handleUpdateUser = (data) => {
-    setUser(prev => ({ ...prev, ...data }))
-    // Also update ownerName on existing prayers
-    if (data.name) {
-      setPrayers(prev => prev.map(p =>
-        p.ownerId === user.id ? { ...p, ownerName: data.name } : p
-      ))
+    try {
+      await markAnswered(prayerId, note)
+    } catch (err) {
+      console.error('Failed to mark answered:', err)
     }
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  const handleAddPrayer = async (data) => {
+    if (!user) return
+    try {
+      const newPrayer = await addPrayer({
+        title: data.title,
+        request: data.request,
+        groupIds: data.groupIds,
+        userId: user.id,
+        userName: user.name,
+        userPhone: user.phone,
+      })
+      setPrayers(prev => [newPrayer, ...prev])
+      setShowAddPrayer(false)
+      setActiveTab('home')
+    } catch (err) {
+      console.error('Failed to add prayer:', err)
+    }
+  }
+
+  const handleCreateGroup = async (data) => {
+    if (!user) return
+    try {
+      const newGroup = await createGroup(data, user.id, user.name)
+      setGroups(prev => [...prev, newGroup])
+    } catch (err) {
+      console.error('Failed to create group:', err)
+      throw err
+    }
+  }
+
+  const handleJoinGroup = async (code) => {
+    try {
+      const result = await joinGroupByCode(code)
+      if (result?.success) {
+        const updatedGroups = await getMyGroups()
+        setGroups(updatedGroups)
+        const groupIds = updatedGroups.map(g => g.id)
+        const updatedPrayers = await getPrayers(groupIds)
+        setPrayers(updatedPrayers)
+      }
+      return result
+    } catch (err) {
+      console.error('Failed to join group:', err)
+      return { success: false, message: err.message || 'Failed to join group.' }
+    }
+  }
+
+  const handleLeaveGroup = async (groupId) => {
+    try {
+      await leaveGroup(groupId)
+      setGroups(prev => prev.filter(g => g.id !== groupId))
+    } catch (err) {
+      console.error('Failed to leave group:', err)
+    }
+  }
+
+  const handleUpdateUser = async (data) => {
+    try {
+      await updateProfile({ name: data.name, phone: data.phone })
+      setUser(prev => ({ ...prev, ...data }))
+      if (data.name) {
+        setPrayers(prev => prev.map(p =>
+          p.ownerId === user.id ? { ...p, ownerName: data.name } : p
+        ))
+      }
+    } catch (err) {
+      console.error('Failed to update profile:', err)
+      throw err
+    }
+  }
+
   if (!ready) return <Splash />
 
   if (!user) {
-    return <Welcome onSignUp={handleSignUp} onSignIn={handleSignIn} />
+    return <Welcome onAuthSuccess={loadData} />
   }
 
   const screenProps = { user, prayers, groups }

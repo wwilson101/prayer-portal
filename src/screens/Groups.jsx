@@ -229,12 +229,21 @@ function CreateGroupModal({ onClose, onCreate }) {
 function JoinGroupModal({ onClose, onJoin }) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) { setError('Enter a group code'); return; }
     if (trimmed.length < 4) { setError('Code must be at least 4 characters'); return; }
-    onJoin(trimmed);
+    setLoading(true);
+    setError('');
+    const result = await onJoin(trimmed);
+    setLoading(false);
+    if (result?.success) {
+      onClose();
+    } else {
+      setError(result?.message || 'Failed to join group.');
+    }
   };
 
   return (
@@ -268,10 +277,9 @@ function JoinGroupModal({ onClose, onJoin }) {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={onClose} className="btn-ghost flex-1">Cancel</button>
-            <button onClick={handleJoin} className="btn-primary flex-1 flex items-center justify-center gap-2">
-              <LogIn size={16} />
-              Join Group
+            <button onClick={onClose} disabled={loading} className="btn-ghost flex-1">Cancel</button>
+            <button onClick={handleJoin} disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-60">
+              {loading ? 'Joining...' : <><LogIn size={16} />Join Group</>}
             </button>
           </div>
         </div>
@@ -345,11 +353,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
       {showJoin && (
         <JoinGroupModal
           onClose={() => setShowJoin(false)}
-          onJoin={(code) => {
-            const result = onJoinGroup(code);
-            if (result && result.success) { setShowJoin(false); }
-            else if (result && result.message) { alert(result.message); }
-          }}
+          onJoin={onJoinGroup}
         />
       )}
       {selectedGroup && (
