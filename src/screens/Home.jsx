@@ -31,10 +31,10 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
       <div className="header-bg px-5 pt-14 pb-4 sticky top-0 z-30">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-xs text-violet-500 font-medium">Good to see you,</p>
+            <p className="text-xs font-medium" style={{ color: '#6ee75a' }}>Good to see you,</p>
             <h1 className="text-2xl font-bold gradient-text">{user.name.split(' ')[0]}</h1>
           </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-300 to-violet-400 flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 rounded-full gradient-bg-deep flex items-center justify-center shadow-md">
             <svg width="16" height="20" viewBox="0 0 52 60" fill="none">
               <rect x="22" y="0" width="8" height="60" rx="4" fill="white"/>
               <rect x="8" y="12" width="36" height="8" rx="4" fill="white"/>
@@ -45,12 +45,12 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
         {/* Stats pills */}
         <div className="flex gap-3 mb-4">
           <div className="glass-card-blue rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-xl font-bold text-sky-600">{activeCount}</span>
-            <span className="text-xs text-sky-500 font-medium">Active</span>
+            <span className="text-xl font-bold" style={{ color: '#6ee75a' }}>{activeCount}</span>
+            <span className="text-xs font-medium" style={{ color: '#5aaa5a' }}>Active</span>
           </div>
           <div className="glass-card-purple rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-xl font-bold text-violet-600">{answeredCount}</span>
-            <span className="text-xs text-violet-500 font-medium flex items-center gap-1">
+            <span className="text-xl font-bold" style={{ color: '#6ee75a' }}>{answeredCount}</span>
+            <span className="text-xs font-medium flex items-center gap-1" style={{ color: '#5aaa5a' }}>
               <Sparkles size={10} />
               Answered
             </span>
@@ -59,7 +59,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: '#4a6a4a' }} />
           <input
             type="text"
             placeholder="Search prayers..."
@@ -79,8 +79,9 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
                 filter === val
                   ? 'gradient-bg-deep text-white shadow-sm'
-                  : 'bg-white/60 text-slate-500 border border-slate-200'
+                  : 'border'
               }`}
+              style={filter !== val ? { background: '#1a2a1a', color: '#5a7a5a', borderColor: '#2a3a2a' } : {}}
             >
               {label}
             </button>
@@ -100,18 +101,18 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
             </div>
             {myGroupIds.length === 0 ? (
               <>
-                <p className="text-base font-semibold text-indigo-800 mb-1">Join a group first</p>
-                <p className="text-sm text-slate-500 max-w-xs">Join or create a prayer group to see and share prayer requests with others.</p>
+                <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>Join a group first</p>
+                <p className="text-sm max-w-xs" style={{ color: '#5a7a5a' }}>Join or create a prayer group to see and share prayer requests with others.</p>
               </>
             ) : search.trim() ? (
               <>
-                <p className="text-base font-semibold text-indigo-800 mb-1">No results found</p>
-                <p className="text-sm text-slate-500">Try a different search term.</p>
+                <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>No results found</p>
+                <p className="text-sm" style={{ color: '#5a7a5a' }}>Try a different search term.</p>
               </>
             ) : (
               <>
-                <p className="text-base font-semibold text-indigo-800 mb-1">No prayers yet</p>
-                <p className="text-sm text-slate-500 max-w-xs">Be the first to share a prayer request with your group.</p>
+                <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>No prayers yet</p>
+                <p className="text-sm max-w-xs" style={{ color: '#5a7a5a' }}>Be the first to share a prayer request with your group.</p>
               </>
             )}
           </div>

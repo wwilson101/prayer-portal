@@ -28,18 +28,21 @@ export default function BottomNav({ activeTab, onTabChange, isAdmin }) {
             >
               <Icon
                 size={22}
-                className={`transition-all duration-200 ${
-                  active
-                    ? isAdminTab ? 'text-amber-500 stroke-[2.5]' : 'text-violet-600 stroke-[2.5]'
-                    : 'text-slate-400 stroke-[1.5]'
-                }`}
+                className="transition-all duration-200"
+                style={{
+                  color: active
+                    ? isAdminTab ? '#d4a050' : '#6ee75a'
+                    : '#4a5e4a',
+                  strokeWidth: active ? 2.5 : 1.5,
+                }}
               />
               <span
-                className={`text-[10px] font-medium transition-all duration-200 ${
-                  active
-                    ? isAdminTab ? 'text-amber-500' : 'text-violet-600'
-                    : 'text-slate-400'
-                }`}
+                className="text-[10px] font-medium transition-all duration-200"
+                style={{
+                  color: active
+                    ? isAdminTab ? '#d4a050' : '#6ee75a'
+                    : '#4a5e4a',
+                }}
               >
                 {label}
               </span>

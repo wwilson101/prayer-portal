@@ -10,10 +10,13 @@ function SectionHeader({ title, count, expanded, onToggle }) {
       className="w-full flex items-center justify-between py-2"
     >
       <div className="flex items-center gap-2">
-        <span className="text-sm font-bold text-slate-700">{title}</span>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold">{count}</span>
+        <span className="text-sm font-bold" style={{ color: '#c8e090' }}>{title}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: '#1a2a1a', color: '#5a7a5a' }}>{count}</span>
       </div>
-      {expanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+      {expanded
+        ? <ChevronUp size={16} style={{ color: '#4a6a4a' }} />
+        : <ChevronDown size={16} style={{ color: '#4a6a4a' }} />
+      }
     </button>
   )
 }
@@ -122,12 +125,13 @@ export default function Admin({ currentUserId }) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold gradient-text mb-0.5">Admin</h1>
-            <p className="text-sm text-slate-500">Manage users, groups & prayers</p>
+            <p className="text-sm" style={{ color: '#5a7a5a' }}>Manage users, groups & prayers</p>
           </div>
           <button
             onClick={load}
             disabled={loading}
-            className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors disabled:opacity-40"
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors disabled:opacity-40"
+            style={{ background: '#1a2a1a', color: '#5a7a5a' }}
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -136,13 +140,13 @@ export default function Admin({ currentUserId }) {
 
       <div className="px-4 pt-4 space-y-3">
         {error && (
-          <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+          <div className="px-4 py-3 rounded-xl text-sm text-red-400 border border-red-800" style={{ background: '#2a0f0f' }}>
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-slate-400 text-sm">
+          <div className="flex items-center justify-center py-20 text-sm" style={{ color: '#4a6a4a' }}>
             Loading...
           </div>
         ) : (
@@ -155,9 +159,9 @@ export default function Admin({ currentUserId }) {
                 { label: 'Prayers', value: prayers.length, icon: BookOpen },
               ].map(({ label, value, icon: Icon }) => (
                 <div key={label} className="glass-card rounded-xl p-3 text-center">
-                  <Icon size={16} className="text-slate-400 mx-auto mb-1" />
-                  <p className="text-xl font-bold text-slate-700">{value}</p>
-                  <p className="text-[11px] text-slate-400">{label}</p>
+                  <Icon size={16} className="mx-auto mb-1" style={{ color: '#4a6a4a' }} />
+                  <p className="text-xl font-bold" style={{ color: '#c8e090' }}>{value}</p>
+                  <p className="text-[11px]" style={{ color: '#4a6a4a' }}>{label}</p>
                 </div>
               ))}
             </div>
@@ -173,39 +177,40 @@ export default function Admin({ currentUserId }) {
               {expandedSection === 'users' && (
                 <div className="mt-3 space-y-2">
                   {users.map(u => (
-                    <div key={u.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div key={u.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#141c14' }}>
                       <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarColor(u.name)} flex items-center justify-center flex-shrink-0`}>
                         <span className="text-white text-xs font-bold">{getInitials(u.name)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-slate-700 truncate">{u.name}</p>
+                          <p className="text-sm font-semibold truncate" style={{ color: '#c8e090' }}>{u.name}</p>
                           {u.is_admin && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-600 font-semibold flex-shrink-0">Admin</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#2a1e0a', color: '#d4a050' }}>Admin</span>
                           )}
                           {u.id === currentUserId && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-500 font-semibold flex-shrink-0">You</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#1a3020', color: '#6ee75a' }}>You</span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400">Joined {formatDate(u.created_at)}</p>
+                        <p className="text-xs" style={{ color: '#4a6a4a' }}>Joined {formatDate(u.created_at)}</p>
                       </div>
                       {u.id !== currentUserId && (
                         <div className="flex items-center gap-1.5 flex-shrink-0">
                           <button
                             onClick={() => handleToggleAdmin(u.id, u.is_admin)}
                             disabled={actionLoading === `admin-${u.id}`}
-                            className={`text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                              u.is_admin
-                                ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                            }`}
+                            className="text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                            style={u.is_admin
+                              ? { background: '#2a1e0a', color: '#d4a050' }
+                              : { background: '#1a2a1a', color: '#5a7a5a' }
+                            }
                           >
                             {u.is_admin ? 'Revoke Admin' : 'Make Admin'}
                           </button>
                           <button
                             onClick={() => handleDeleteUser(u.id, u.name)}
                             disabled={actionLoading === `delete-user-${u.id}`}
-                            className="w-7 h-7 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50"
+                            className="w-7 h-7 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50"
+                            style={{ background: '#2a0f0f' }}
                           >
                             <Trash2 size={13} />
                           </button>
@@ -213,7 +218,7 @@ export default function Admin({ currentUserId }) {
                       )}
                     </div>
                   ))}
-                  {users.length === 0 && <p className="text-sm text-slate-400 text-center py-4">No users yet</p>}
+                  {users.length === 0 && <p className="text-sm text-center py-4" style={{ color: '#4a6a4a' }}>No users yet</p>}
                 </div>
               )}
             </div>
@@ -229,19 +234,20 @@ export default function Admin({ currentUserId }) {
               {expandedSection === 'groups' && (
                 <div className="mt-3 space-y-3">
                   {groups.map(g => (
-                    <div key={g.id} className="p-3 bg-slate-50 rounded-xl">
+                    <div key={g.id} className="p-3 rounded-xl" style={{ background: '#141c14' }}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-bold text-slate-700 truncate">{g.name}</p>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-500 font-mono font-semibold flex-shrink-0">{g.code}</span>
+                            <p className="text-sm font-bold truncate" style={{ color: '#c8e090' }}>{g.name}</p>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold flex-shrink-0" style={{ background: '#1e2e1e', color: '#5a7a5a' }}>{g.code}</span>
                           </div>
-                          <p className="text-xs text-slate-400">{g.members.length} member{g.members.length !== 1 ? 's' : ''} · {formatDate(g.createdAt)}</p>
+                          <p className="text-xs" style={{ color: '#4a6a4a' }}>{g.members.length} member{g.members.length !== 1 ? 's' : ''} · {formatDate(g.createdAt)}</p>
                         </div>
                         <button
                           onClick={() => handleDeleteGroup(g.id, g.name)}
                           disabled={actionLoading === `group-${g.id}`}
-                          className="ml-2 w-8 h-8 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50 flex-shrink-0"
+                          className="ml-2 w-8 h-8 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50 flex-shrink-0"
+                          style={{ background: '#2a0f0f' }}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -252,11 +258,12 @@ export default function Admin({ currentUserId }) {
                             <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${getAvatarColor(m.name)} flex items-center justify-center flex-shrink-0`}>
                               <span className="text-white text-[8px] font-bold">{getInitials(m.name)}</span>
                             </div>
-                            <span className="text-xs text-slate-500 flex-1 truncate">{m.name}</span>
+                            <span className="text-xs flex-1 truncate" style={{ color: '#5a7a5a' }}>{m.name}</span>
                             <button
                               onClick={() => handleRemoveMember(g.id, m.id, m.name)}
                               disabled={actionLoading === `member-${g.id}-${m.id}`}
-                              className="w-6 h-6 rounded-lg text-slate-300 hover:text-red-400 hover:bg-red-50 flex items-center justify-center transition-colors disabled:opacity-50"
+                              className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80"
+                              style={{ color: '#4a6a4a' }}
                             >
                               <UserMinus size={12} />
                             </button>
@@ -265,7 +272,7 @@ export default function Admin({ currentUserId }) {
                       </div>
                     </div>
                   ))}
-                  {groups.length === 0 && <p className="text-sm text-slate-400 text-center py-4">No groups yet</p>}
+                  {groups.length === 0 && <p className="text-sm text-center py-4" style={{ color: '#4a6a4a' }}>No groups yet</p>}
                 </div>
               )}
             </div>
@@ -281,29 +288,31 @@ export default function Admin({ currentUserId }) {
               {expandedSection === 'prayers' && (
                 <div className="mt-3 space-y-2">
                   {prayers.map(p => (
-                    <div key={p.id} className="p-3 bg-slate-50 rounded-xl">
+                    <div key={p.id} className="p-3 rounded-xl" style={{ background: '#141c14' }}>
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-slate-700 flex-1 truncate">{p.title}</p>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${
-                          p.status === 'answered'
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-blue-100 text-blue-500'
-                        }`}>
+                        <p className="text-sm font-semibold flex-1 truncate" style={{ color: '#c8e090' }}>{p.title}</p>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0"
+                          style={p.status === 'answered'
+                            ? { background: '#0f2a0f', color: '#6ee75a' }
+                            : { background: '#1a3020', color: '#5aaa5a' }
+                          }
+                        >
                           {p.status}
                         </span>
                         <button
                           onClick={() => handleDeletePrayer(p.id, p.title)}
                           disabled={actionLoading === `prayer-${p.id}`}
-                          className="w-7 h-7 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50 flex-shrink-0"
+                          className="w-7 h-7 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50 flex-shrink-0"
+                          style={{ background: '#2a0f0f' }}
                         >
                           <Trash2 size={13} />
                         </button>
                       </div>
-                      <p className="text-xs text-slate-400">By {p.ownerName} · {formatDate(p.requestDate)}</p>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{p.request}</p>
+                      <p className="text-xs" style={{ color: '#4a6a4a' }}>By {p.ownerName} · {formatDate(p.requestDate)}</p>
+                      <p className="text-xs mt-1 line-clamp-2" style={{ color: '#5a7a5a' }}>{p.request}</p>
                     </div>
                   ))}
-                  {prayers.length === 0 && <p className="text-sm text-slate-400 text-center py-4">No prayers yet</p>}
+                  {prayers.length === 0 && <p className="text-sm text-center py-4" style={{ color: '#4a6a4a' }}>No prayers yet</p>}
                 </div>
               )}
             </div>

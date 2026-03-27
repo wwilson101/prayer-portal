@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import './index.css'
+import logo from './assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png'
 
 import Welcome from './screens/Welcome'
 import Home from './screens/Home'
@@ -18,13 +19,10 @@ import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotif
 
 function Splash() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#111211' }}>
       <div className="flex flex-col items-center gap-4 animate-pulse-soft">
-        <div className="w-20 h-20 rounded-3xl gradient-bg-deep flex items-center justify-center shadow-xl shadow-violet-200">
-          <svg width="30" height="36" viewBox="0 0 52 60" fill="none">
-            <rect x="22" y="0" width="8" height="60" rx="4" fill="white" opacity="0.95"/>
-            <rect x="8" y="12" width="36" height="8" rx="4" fill="white" opacity="0.95"/>
-          </svg>
+        <div className="w-20 h-20 rounded-3xl gradient-bg-deep flex items-center justify-center shadow-xl" style={{ boxShadow: '0 0 24px rgba(110,231,90,0.2)' }}>
+          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
         </div>
         <p className="gradient-text font-bold text-xl">Prayer Portal</p>
       </div>
@@ -220,7 +218,7 @@ export default function App() {
   const screenProps = { user, prayers, groups }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen" style={{ background: '#111211' }}>
       {activeTab === 'home' && (
         <Home
           {...screenProps}

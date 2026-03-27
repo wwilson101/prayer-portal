@@ -18,38 +18,38 @@ function GroupCard({ group, userId, onClick }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-indigo-900 truncate">{group.name}</h3>
+            <h3 className="text-sm font-bold truncate" style={{ color: '#d4e8a0' }}>{group.name}</h3>
             {isOwner && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 text-violet-600 font-semibold flex-shrink-0">
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 border" style={{ background: '#1a3020', color: '#6ee75a', borderColor: '#2d5a2d' }}>
                 Admin
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-0.5 truncate">{group.description || 'No description'}</p>
+          <p className="text-xs mt-0.5 truncate" style={{ color: '#4a6a4a' }}>{group.description || 'No description'}</p>
         </div>
-        <ChevronRight size={16} className="text-slate-300 flex-shrink-0" />
+        <ChevronRight size={16} className="flex-shrink-0" style={{ color: '#3a5a3a' }} />
       </div>
 
       {/* Members row */}
-      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+      <div className="flex items-center gap-2 mt-3 pt-3 border-t" style={{ borderColor: '#1e2e1e' }}>
         <div className="flex -space-x-2">
           {group.members.slice(0, 4).map((member, i) => (
             <div
               key={member.id}
-              className={`w-7 h-7 rounded-full bg-gradient-to-br ${getAvatarColor(member.name)} flex items-center justify-center border-2 border-white shadow-sm`}
-              style={{ zIndex: 10 - i }}
+              className={`w-7 h-7 rounded-full bg-gradient-to-br ${getAvatarColor(member.name)} flex items-center justify-center border-2 shadow-sm`}
+              style={{ zIndex: 10 - i, borderColor: '#1a1f1a' }}
             >
               <span className="text-white text-[9px] font-bold">{getInitials(member.name)}</span>
             </div>
           ))}
           {memberCount > 4 && (
-            <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center border-2 border-white text-[9px] text-slate-500 font-bold">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center border-2 text-[9px] font-bold" style={{ background: '#1e2e1e', borderColor: '#1a1f1a', color: '#5a7a5a' }}>
               +{memberCount - 4}
             </div>
           )}
         </div>
-        <span className="text-xs text-slate-400">{memberCount} {memberCount === 1 ? 'member' : 'members'}</span>
-        <span className="ml-auto text-xs text-slate-300 flex items-center gap-1">
+        <span className="text-xs" style={{ color: '#4a6a4a' }}>{memberCount} {memberCount === 1 ? 'member' : 'members'}</span>
+        <span className="ml-auto text-xs flex items-center gap-1" style={{ color: '#3a5a3a' }}>
           <Lock size={10} />
           {group.code}
         </span>
@@ -73,14 +73,14 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 max-h-[85vh] overflow-y-auto animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-violet-200" />
+          <div className="w-10 h-1 rounded-full" style={{ background: '#2d5a2d' }} />
         </div>
 
         <div className="px-5 pb-8 pt-3">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-indigo-900">Group Details</h2>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center border border-slate-200">
-              <X size={16} className="text-slate-500" />
+            <h2 className="text-lg font-bold" style={{ color: '#d4e8a0' }}>Group Details</h2>
+            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center border" style={{ background: '#1a2a1a', borderColor: '#2a3a2a' }}>
+              <X size={16} style={{ color: '#5a7a5a' }} />
             </button>
           </div>
 
@@ -91,36 +91,38 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
                 <Users size={20} className="text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-indigo-900">{group.name}</h3>
-                {isOwner && <span className="text-xs text-violet-500">You created this group</span>}
+                <h3 className="font-bold" style={{ color: '#d4e8a0' }}>{group.name}</h3>
+                {isOwner && <span className="text-xs" style={{ color: '#6ee75a' }}>You created this group</span>}
               </div>
             </div>
             {group.description && (
-              <p className="text-sm text-slate-500 leading-relaxed">{group.description}</p>
+              <p className="text-sm leading-relaxed" style={{ color: '#5a7a5a' }}>{group.description}</p>
             )}
           </div>
 
           {/* Join code */}
           <div className="glass-card-purple rounded-xl p-4 mb-4">
-            <p className="text-xs font-semibold text-violet-600 uppercase tracking-wide mb-2">Invite Code</p>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#6ee75a' }}>Invite Code</p>
             <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold tracking-[0.3em] text-indigo-900 flex-1">{group.code}</span>
+              <span className="text-2xl font-bold tracking-[0.3em] flex-1" style={{ color: '#d4e8a0' }}>{group.code}</span>
               <button
                 onClick={copyCode}
-                className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all ${
-                  copied ? 'bg-green-100 text-green-600' : 'bg-violet-100 text-violet-600 hover:bg-violet-200'
-                }`}
+                className="px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all border"
+                style={copied
+                  ? { background: '#1a3a1a', color: '#6ee75a', borderColor: '#2d5a2d' }
+                  : { background: '#1a3020', color: '#6ee75a', borderColor: '#2d5a2d' }
+                }
               >
                 {copied ? <Check size={14} /> : <Copy size={14} />}
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <p className="text-xs text-slate-400 mt-1">Share this code with others to join your group</p>
+            <p className="text-xs mt-1" style={{ color: '#4a6a4a' }}>Share this code with others to join your group</p>
           </div>
 
           {/* Members list */}
           <div className="mb-4">
-            <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-2">
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#7acc7a' }}>
               Members ({group.members.length})
             </p>
             <div className="space-y-2">
@@ -132,13 +134,13 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
                       <span className="text-white text-xs font-bold">{getInitials(member.name)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-indigo-800 truncate">
+                      <p className="text-sm font-semibold truncate" style={{ color: '#c8e090' }}>
                         {isMe ? `${member.name} (You)` : member.name}
                       </p>
-                      <p className="text-xs text-slate-400">Joined {formatDate(member.joinedAt)}</p>
+                      <p className="text-xs" style={{ color: '#4a6a4a' }}>Joined {formatDate(member.joinedAt)}</p>
                     </div>
                     {member.id === group.createdBy && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 text-violet-600 font-semibold">Admin</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold border" style={{ background: '#1a3020', color: '#6ee75a', borderColor: '#2d5a2d' }}>Admin</span>
                     )}
                   </div>
                 );
@@ -150,7 +152,8 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
           {!isOwner && (
             <button
               onClick={() => onLeave(group.id)}
-              className="w-full py-3 rounded-xl text-sm font-semibold text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 transition-colors"
+              className="w-full py-3 rounded-xl text-sm font-semibold text-red-400 border border-red-800 hover:opacity-80 transition-colors"
+              style={{ background: '#2a0f0f' }}
             >
               Leave Group
             </button>
@@ -184,19 +187,19 @@ function CreateGroupModal({ onClose, onCreate }) {
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-violet-200" />
+          <div className="w-10 h-1 rounded-full" style={{ background: '#2d5a2d' }} />
         </div>
         <div className="px-5 pb-8 pt-3">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-indigo-900">Create a Group</h2>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center border border-slate-200">
-              <X size={16} className="text-slate-500" />
+            <h2 className="text-lg font-bold" style={{ color: '#d4e8a0' }}>Create a Group</h2>
+            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center border" style={{ background: '#1a2a1a', borderColor: '#2a3a2a' }}>
+              <X size={16} style={{ color: '#5a7a5a' }} />
             </button>
           </div>
 
           <div className="space-y-4 mb-6">
             <div>
-              <label className="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1.5 block">Group Name *</label>
+              <label className="text-xs font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: '#7acc7a' }}>Group Name *</label>
               <input
                 type="text"
                 placeholder="e.g. Sunday Small Group"
@@ -207,8 +210,8 @@ function CreateGroupModal({ onClose, onCreate }) {
               {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
             </div>
             <div>
-              <label className="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1.5 block">
-                Description <span className="text-slate-400 normal-case font-normal">(optional)</span>
+              <label className="text-xs font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: '#7acc7a' }}>
+                Description <span className="normal-case font-normal" style={{ color: '#4a6a4a' }}>(optional)</span>
               </label>
               <textarea
                 rows={3}
@@ -257,20 +260,20 @@ function JoinGroupModal({ onClose, onJoin }) {
       <div className="modal-overlay absolute inset-0" onClick={onClose} />
       <div className="modal-sheet relative z-10 animate-slide-up">
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-violet-200" />
+          <div className="w-10 h-1 rounded-full" style={{ background: '#2d5a2d' }} />
         </div>
         <div className="px-5 pb-8 pt-3">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-indigo-900">Join a Group</h2>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center border border-slate-200">
-              <X size={16} className="text-slate-500" />
+            <h2 className="text-lg font-bold" style={{ color: '#d4e8a0' }}>Join a Group</h2>
+            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center border" style={{ background: '#1a2a1a', borderColor: '#2a3a2a' }}>
+              <X size={16} style={{ color: '#5a7a5a' }} />
             </button>
           </div>
 
-          <p className="text-sm text-slate-500 mb-5">Enter the 6-character code shared by your group admin.</p>
+          <p className="text-sm mb-5" style={{ color: '#5a7a5a' }}>Enter the 6-character code shared by your group admin.</p>
 
           <div className="mb-5">
-            <label className="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1.5 block">Group Code</label>
+            <label className="text-xs font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: '#7acc7a' }}>Group Code</label>
             <input
               type="text"
               placeholder="e.g. FAITH1"
@@ -307,7 +310,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
       {/* Header */}
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
         <h1 className="text-2xl font-bold gradient-text mb-1">Groups</h1>
-        <p className="text-sm text-slate-500">Your prayer communities</p>
+        <p className="text-sm" style={{ color: '#5a7a5a' }}>Your prayer communities</p>
       </div>
 
       {/* Action buttons */}
@@ -337,8 +340,8 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
             <div className="w-20 h-20 rounded-3xl gradient-bg flex items-center justify-center mb-4 shadow-lg">
               <Users size={32} className="text-white/90" />
             </div>
-            <p className="text-base font-semibold text-indigo-800 mb-1">No groups yet</p>
-            <p className="text-sm text-slate-500 max-w-xs">Create your own prayer group or join an existing one with a group code.</p>
+            <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>No groups yet</p>
+            <p className="text-sm max-w-xs" style={{ color: '#5a7a5a' }}>Create your own prayer group or join an existing one with a group code.</p>
           </div>
         ) : (
           myGroups.map(group => (

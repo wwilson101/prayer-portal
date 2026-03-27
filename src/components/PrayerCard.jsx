@@ -1,4 +1,4 @@
-import { Heart, CheckCircle2, Users, Clock } from 'lucide-react';
+import { Heart, CircleCheck as CheckCircle2, Users, Clock } from 'lucide-react';
 import { formatDate, getInitials, getAvatarColor } from '../utils/helpers';
 
 export default function PrayerCard({ prayer, groups, currentUserId, onPray, onClick, compact = false }) {
@@ -33,7 +33,7 @@ export default function PrayerCard({ prayer, groups, currentUserId, onPray, onCl
         {/* Name + date */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-indigo-900 truncate">
+            <span className="text-sm font-semibold truncate" style={{ color: '#d4e8a0' }}>
               {isOwner ? 'You' : prayer.ownerName}
             </span>
             {isAnswered && (
@@ -43,7 +43,7 @@ export default function PrayerCard({ prayer, groups, currentUserId, onPray, onCl
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
+          <div className="flex items-center gap-1 text-[11px] mt-0.5" style={{ color: '#4a6a4a' }}>
             <Clock size={10} />
             <span>{formatDate(prayer.requestDate)}</span>
             {groupNames.length > 0 && (
@@ -58,22 +58,22 @@ export default function PrayerCard({ prayer, groups, currentUserId, onPray, onCl
       </div>
 
       {/* Title */}
-      <h3 className="text-[15px] font-semibold text-indigo-900 mb-1 leading-snug">
+      <h3 className="text-[15px] font-semibold mb-1 leading-snug" style={{ color: '#d4e8a0' }}>
         {prayer.title}
       </h3>
 
       {/* Request text */}
       {!compact && (
-        <p className="text-[13px] text-slate-500 leading-relaxed line-clamp-3 mb-3">
+        <p className="text-[13px] leading-relaxed line-clamp-3 mb-3" style={{ color: '#5a7a5a' }}>
           {prayer.request}
         </p>
       )}
 
       {/* Answered note */}
       {isAnswered && prayer.answeredNote && !compact && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3">
-          <p className="text-[12px] text-green-700 font-medium flex items-start gap-1.5">
-            <CheckCircle2 size={12} className="mt-0.5 flex-shrink-0 text-green-500" />
+        <div className="rounded-xl p-3 mb-3 border" style={{ background: '#0f2a0f', borderColor: '#2d5a2d' }}>
+          <p className="text-[12px] font-medium flex items-start gap-1.5" style={{ color: '#6ee75a' }}>
+            <CheckCircle2 size={12} className="mt-0.5 flex-shrink-0" style={{ color: '#6ee75a' }} />
             {prayer.answeredNote}
           </p>
         </div>
@@ -86,21 +86,21 @@ export default function PrayerCard({ prayer, groups, currentUserId, onPray, onCl
             e.stopPropagation();
             onPray && onPray(prayer.id);
           }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 ${
-            hasPrayed
-              ? 'bg-violet-100 text-violet-600 border border-violet-200'
-              : 'bg-white/60 text-slate-500 border border-slate-200 hover:bg-violet-50 hover:text-violet-500'
-          }`}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 border"
+          style={hasPrayed
+            ? { background: '#1a3020', color: '#6ee75a', borderColor: '#2d5a2d' }
+            : { background: '#1a2a1a', color: '#5a7a5a', borderColor: '#2a3a2a' }
+          }
         >
           <Heart
             size={13}
-            className={hasPrayed ? 'fill-violet-500 text-violet-500' : ''}
+            style={hasPrayed ? { fill: '#6ee75a', color: '#6ee75a' } : {}}
           />
           {prayerCount > 0 ? `${prayerCount} praying` : 'Pray'}
         </button>
 
         {isAnswered && (
-          <span className="text-[11px] text-green-600 font-medium flex items-center gap-1">
+          <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: '#6ee75a' }}>
             <CheckCircle2 size={12} />
             God answered!
           </span>

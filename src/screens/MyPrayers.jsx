@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, CheckCircle2, Clock, Sparkles } from 'lucide-react';
+import { Plus, CircleCheck as CheckCircle2, Clock, Sparkles } from 'lucide-react';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 import MarkAnsweredModal from '../components/MarkAnsweredModal';
@@ -25,27 +25,27 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
       {/* Header */}
       <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
         <h1 className="text-2xl font-bold gradient-text mb-1">My Prayers</h1>
-        <p className="text-sm text-slate-500 mb-4">Your personal prayer journey</p>
+        <p className="text-sm mb-4" style={{ color: '#5a7a5a' }}>Your personal prayer journey</p>
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="glass-card-blue rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-sky-600">{activeCount}</p>
-            <p className="text-[10px] text-sky-500 font-medium flex items-center justify-center gap-1 mt-0.5">
+            <p className="text-2xl font-bold" style={{ color: '#6ee75a' }}>{activeCount}</p>
+            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#5aaa5a' }}>
               <Clock size={9} />
               Active
             </p>
           </div>
           <div className="glass-card-purple rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-violet-600">{answeredCount}</p>
-            <p className="text-[10px] text-violet-500 font-medium flex items-center justify-center gap-1 mt-0.5">
+            <p className="text-2xl font-bold" style={{ color: '#6ee75a' }}>{answeredCount}</p>
+            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#5aaa5a' }}>
               <Sparkles size={9} />
               Answered
             </p>
           </div>
           <div className="glass-card rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-indigo-600">{totalPraying}</p>
-            <p className="text-[10px] text-indigo-400 font-medium mt-0.5">Praying</p>
+            <p className="text-2xl font-bold" style={{ color: '#6ee75a' }}>{totalPraying}</p>
+            <p className="text-[10px] font-medium mt-0.5" style={{ color: '#5aaa5a' }}>Praying</p>
           </div>
         </div>
 
@@ -58,8 +58,9 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
                 filter === val
                   ? 'gradient-bg-deep text-white shadow-sm'
-                  : 'bg-white/60 text-slate-500 border border-slate-200'
+                  : 'border'
               }`}
+              style={filter !== val ? { background: '#1a2a1a', color: '#5a7a5a', borderColor: '#2a3a2a' } : {}}
             >
               {label}
             </button>
@@ -77,10 +78,10 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
                 <rect x="8" y="12" width="36" height="8" rx="4" fill="white" opacity="0.9"/>
               </svg>
             </div>
-            <p className="text-base font-semibold text-indigo-800 mb-1">
+            <p className="text-base font-semibold mb-1" style={{ color: '#c8e090' }}>
               {filter !== 'all' ? `No ${filter} prayers` : 'No prayers yet'}
             </p>
-            <p className="text-sm text-slate-500 max-w-xs mb-6">
+            <p className="text-sm max-w-xs mb-6" style={{ color: '#5a7a5a' }}>
               {filter !== 'all' ? 'Try changing the filter above.' : 'Share your first prayer request with your group.'}
             </p>
             {filter === 'all' && (
@@ -103,7 +104,8 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
               {prayer.status === 'active' && (
                 <button
                   onClick={() => setMarkingAnswered(prayer)}
-                  className="absolute top-3 right-3 text-[11px] bg-green-50 text-green-600 border border-green-200 px-2.5 py-1 rounded-full font-medium flex items-center gap-1 hover:bg-green-100 transition-colors z-10"
+                  className="absolute top-3 right-3 text-[11px] border px-2.5 py-1 rounded-full font-medium flex items-center gap-1 hover:opacity-80 transition-colors z-10"
+                  style={{ background: '#0f2a0f', color: '#6ee75a', borderColor: '#2d5a2d' }}
                 >
                   <CheckCircle2 size={11} />
                   Answered?

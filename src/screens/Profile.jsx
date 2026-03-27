@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Mail, Phone, Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut } from 'lucide-react';
+import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut } from 'lucide-react';
 import { getInitials, getAvatarColor } from '../utils/helpers';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {
@@ -30,7 +30,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold gradient-text">Profile</h1>
           {saved && (
-            <span className="text-xs bg-green-100 text-green-600 px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in">
+            <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a3a1a', color: '#6ee75a', borderColor: '#2d5a2d' }}>
               <Check size={12} />
               Saved!
             </span>
@@ -56,29 +56,29 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
                 />
               ) : (
                 <>
-                  <h2 className="text-lg font-bold text-indigo-900">{user.name}</h2>
-                  <p className="text-sm text-slate-500">Prayer Portal Member</p>
+                  <h2 className="text-lg font-bold" style={{ color: '#d4e8a0' }}>{user.name}</h2>
+                  <p className="text-sm" style={{ color: '#5a7a5a' }}>Prayer Portal Member</p>
                 </>
               )}
             </div>
             <button
               onClick={editing ? handleSave : () => setEditing(true)}
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-                editing
-                  ? 'bg-green-100 text-green-600 border border-green-200'
-                  : 'bg-violet-100 text-violet-600 border border-violet-200'
-              }`}
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all border"
+              style={editing
+                ? { background: '#1a3a1a', color: '#6ee75a', borderColor: '#2d5a2d' }
+                : { background: '#1a3020', color: '#6ee75a', borderColor: '#2d5a2d' }
+              }
             >
               {editing ? <Check size={16} /> : <Edit3 size={16} />}
             </button>
           </div>
 
           {/* Contact fields */}
-          <div className="space-y-3 pt-3 border-t border-slate-100">
+          <div className="space-y-3 pt-3 border-t" style={{ borderColor: '#1e2e1e' }}>
             {editing ? (
               <>
                 <div className="flex items-center gap-2">
-                  <Mail size={14} className="text-violet-400 flex-shrink-0" />
+                  <Mail size={14} className="flex-shrink-0" style={{ color: '#5aaa5a' }} />
                   <input
                     type="email"
                     value={form.email}
@@ -88,7 +88,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone size={14} className="text-violet-400 flex-shrink-0" />
+                  <Phone size={14} className="flex-shrink-0" style={{ color: '#5aaa5a' }} />
                   <input
                     type="tel"
                     value={form.phone}
@@ -100,13 +100,13 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
               </>
             ) : (
               <>
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <Mail size={14} className="text-violet-400 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-sm" style={{ color: '#5a7a5a' }}>
+                  <Mail size={14} className="flex-shrink-0" style={{ color: '#5aaa5a' }} />
                   <span className="truncate">{user.email}</span>
                 </div>
                 {user.phone && (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Phone size={14} className="text-violet-400 flex-shrink-0" />
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#5a7a5a' }}>
+                    <Phone size={14} className="flex-shrink-0" style={{ color: '#5aaa5a' }} />
                     <span>{user.phone}</span>
                   </div>
                 )}
@@ -124,8 +124,8 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
           ].map(({ value, label, icon }) => (
             <div key={label} className="glass-card rounded-xl p-3 text-center">
               <div className="text-lg mb-0.5">{icon}</div>
-              <p className="text-xl font-bold text-indigo-800">{value}</p>
-              <p className="text-[11px] text-slate-400">{label}</p>
+              <p className="text-xl font-bold" style={{ color: '#c8e090' }}>{value}</p>
+              <p className="text-[11px]" style={{ color: '#4a6a4a' }}>{label}</p>
             </div>
           ))}
         </div>
@@ -133,19 +133,19 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         {/* Settings items */}
         <div className="glass-card rounded-2xl overflow-hidden">
           {[
-            { icon: Bell, label: 'Prayer Reminders', sub: user.phone ? 'Text reminders enabled' : 'Add phone to enable', color: 'text-sky-500' },
-            { icon: Shield, label: 'Privacy', sub: 'Your data stays in your groups', color: 'text-violet-500' },
-            { icon: Heart, label: 'Prayed for Others', sub: `${totalPraying} prayers lifted up`, color: 'text-rose-400' },
+            { icon: Bell, label: 'Prayer Reminders', sub: user.phone ? 'Text reminders enabled' : 'Add phone to enable', color: '#6ee75a' },
+            { icon: Shield, label: 'Privacy', sub: 'Your data stays in your groups', color: '#6ee75a' },
+            { icon: Heart, label: 'Prayed for Others', sub: `${totalPraying} prayers lifted up`, color: '#f87171' },
           ].map(({ icon: Icon, label, sub, color }, i) => (
-            <div key={label} className={`flex items-center gap-3 px-4 py-3.5 ${i > 0 ? 'border-t border-slate-100' : ''}`}>
-              <div className={`w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center ${color}`}>
+            <div key={label} className={`flex items-center gap-3 px-4 py-3.5 ${i > 0 ? 'border-t' : ''}`} style={i > 0 ? { borderColor: '#1e2e1e' } : {}}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#141c14', color }}>
                 <Icon size={16} />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-indigo-800">{label}</p>
-                <p className="text-xs text-slate-400">{sub}</p>
+                <p className="text-sm font-semibold" style={{ color: '#c8e090' }}>{label}</p>
+                <p className="text-xs" style={{ color: '#4a6a4a' }}>{sub}</p>
               </div>
-              <ChevronRight size={14} className="text-slate-300" />
+              <ChevronRight size={14} style={{ color: '#3a5a3a' }} />
             </div>
           ))}
         </div>
@@ -159,15 +159,16 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
             </svg>
           </div>
           <div>
-            <p className="text-sm font-bold text-indigo-800">Prayer Portal</p>
-            <p className="text-xs text-slate-400">Version 1.0 · Built with love & faith</p>
+            <p className="text-sm font-bold" style={{ color: '#c8e090' }}>Prayer Portal</p>
+            <p className="text-xs" style={{ color: '#4a6a4a' }}>Version 1.0 · Built with love & faith</p>
           </div>
         </div>
 
         {/* Logout */}
         <button
           onClick={onLogout}
-          className="w-full py-3.5 rounded-xl text-sm font-semibold text-red-500 border border-red-200 bg-red-50/80 hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl text-sm font-semibold text-red-400 border border-red-800 hover:opacity-80 transition-colors flex items-center justify-center gap-2"
+          style={{ background: '#2a0f0f' }}
         >
           <LogOut size={15} />
           Sign Out
