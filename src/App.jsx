@@ -9,6 +9,7 @@ import Groups from './screens/Groups'
 import Profile from './screens/Profile'
 import Admin from './screens/Admin'
 import AddPrayer from './screens/AddPrayer'
+import UpdatePassword from './screens/UpdatePassword'
 import BottomNav from './components/BottomNav'
 
 import { onAuthStateChange, signOut } from './lib/auth'
@@ -35,6 +36,7 @@ export default function App() {
   const [ready, setReady]         = useState(false)
   const [activeTab, setActiveTab] = useState('home')
   const [showAddPrayer, setShowAddPrayer] = useState(false)
+  const [showUpdatePassword, setShowUpdatePassword] = useState(false)
 
   const loadData = useCallback(async () => {
     try {
@@ -56,6 +58,11 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthStateChange((event, session) => {
       (async () => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setShowUpdatePassword(true)
+          setReady(true)
+          return
+        }
         if (session) {
           await loadData()
         } else {
@@ -213,6 +220,10 @@ export default function App() {
   }
 
   if (!ready) return <Splash />
+
+  if (showUpdatePassword) {
+    return <UpdatePassword onDone={() => { setShowUpdatePassword(false); loadData() }} />
+  }
 
   if (!user) {
     return <Welcome onAuthSuccess={() => {}} />

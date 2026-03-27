@@ -33,3 +33,11 @@ export const getSession = async () => {
   const { data: { session } } = await supabase.auth.getSession()
   return session
 }
+
+export const sendPasswordReset = async (email) => {
+  const appUrl = window.location.origin
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${appUrl}/`,
+  })
+  if (error) throw error
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronRight, Sparkles, ArrowLeft } from 'lucide-react'
-import { signUp, signIn } from '../lib/auth'
+import { signUp, signIn, sendPasswordReset } from '../lib/auth'
 import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png'
 
 export default function Welcome({ onAuthSuccess }) {
@@ -11,6 +11,8 @@ export default function Welcome({ onAuthSuccess }) {
   const [signupForm, setSignupForm] = useState({ name: '', email: '', phone: '', password: '' })
   const [signinForm, setSigninForm] = useState({ email: '', password: '' })
   const [signupErrors, setSignupErrors] = useState({})
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetSent, setResetSent] = useState(false)
 
   const validateSignup = () => {
     const errs = {}
@@ -38,6 +40,20 @@ export default function Welcome({ onAuthSuccess }) {
       await onAuthSuccess()
     } catch (err) {
       setError(err.message || 'Sign up failed.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    if (!resetEmail.trim()) { setError('Please enter your email address.'); return }
+    setError('')
+    setLoading(true)
+    try {
+      await sendPasswordReset(resetEmail.trim())
+      setResetSent(true)
+    } catch (err) {
+      setError(err.message || 'Failed to send reset email.')
     } finally {
       setLoading(false)
     }
@@ -141,6 +157,48 @@ export default function Welcome({ onAuthSuccess }) {
     )
   }
 
+  if (step === 'forgot-password') {
+    return (
+      <div className="min-h-screen flex flex-col px-6 pt-14 pb-6 relative overflow-hidden animate-slide-up" style={{ background: '#000000' }}>
+        <div className="relative z-10 flex-1 flex flex-col">
+          <button onClick={() => { setStep('signin'); setResetSent(false); setResetEmail(''); setError('') }} className="flex items-center gap-1 text-sm mb-8 w-fit hover:opacity-80 transition-colors" style={{ color: '#c8b99a' }}>
+            <ArrowLeft size={16} /> Back
+          </button>
+          <div className="mb-8">
+            <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain mb-5" />
+            <h2 className="text-2xl font-bold mb-1" style={{ color: '#f0ede0' }}>Reset password</h2>
+            <p className="text-sm" style={{ color: '#c8b99a' }}>We'll send you a link to reset your password</p>
+          </div>
+          {resetSent ? (
+            <div className="px-4 py-4 rounded-xl text-sm border" style={{ background: '#0a1f0f', borderColor: '#2d5a3d', color: '#6fcf97' }}>
+              Check your email for a password reset link.
+            </div>
+          ) : (
+            <>
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: '#a89060' }}>Email Address</label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={resetEmail}
+                  onChange={e => { setResetEmail(e.target.value); setError('') }}
+                  onKeyDown={e => e.key === 'Enter' && handleForgotPassword()}
+                  className="input-field"
+                />
+              </div>
+              {error && <div className="mt-4 px-4 py-3 rounded-xl text-sm text-red-400 border border-red-800" style={{ background: '#1a0808' }}>{error}</div>}
+              <div className="mt-auto pt-6">
+                <button onClick={handleForgotPassword} disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2 text-base disabled:opacity-60">
+                  {loading ? 'Sending...' : <><span>Send Reset Link</span><ChevronRight size={18} /></>}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col px-6 pt-14 pb-6 relative overflow-hidden animate-slide-up" style={{ background: '#000000' }}>
       <div className="relative z-10 flex-1 flex flex-col">
@@ -160,7 +218,12 @@ export default function Welcome({ onAuthSuccess }) {
               className="input-field" />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: '#a89060' }}>Password</label>
+            <label className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide mb-1.5" style={{ color: '#a89060' }}>
+              <span>Password</span>
+              <button type="button" onClick={() => { setStep('forgot-password'); setError('') }} className="normal-case font-normal text-xs hover:opacity-80 transition-opacity" style={{ color: '#c8b99a' }}>
+                Forgot password?
+              </button>
+            </label>
             <input type="password" placeholder="Your password" value={signinForm.password}
               onChange={e => { setSigninForm(f => ({ ...f, password: e.target.value })); setError('') }}
               onKeyDown={e => e.key === 'Enter' && handleSignIn()}
