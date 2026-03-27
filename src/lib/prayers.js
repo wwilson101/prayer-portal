@@ -64,22 +64,14 @@ export const getPrayers = async (myGroupIds) => {
 }
 
 export const addPrayer = async ({ title, request, groupIds, userId, userName, userPhone }) => {
-  const { data: prayer, error: pError } = await supabase
-    .from('prayers')
-    .insert({ title, request, owner_id: userId })
-    .select()
-    .single()
+  const { data: prayer, error } = await supabase
+    .rpc('add_prayer_with_groups', {
+      p_title: title,
+      p_request: request,
+      p_group_ids: groupIds,
+    })
 
-  if (pError) throw pError
-
-  // Link to groups
-  if (groupIds.length) {
-    const { error: pgError } = await supabase
-      .from('prayer_groups')
-      .insert(groupIds.map(gid => ({ prayer_id: prayer.id, group_id: gid })))
-
-    if (pgError) throw pgError
-  }
+  if (error) throw error
 
   return {
     id: prayer.id,
