@@ -11,6 +11,7 @@ import AddPrayer from './screens/AddPrayer'
 import BottomNav from './components/BottomNav'
 
 import { onAuthStateChange, signOut } from './lib/auth'
+import { supabase } from './lib/supabase'
 import { getMyProfile, updateProfile } from './lib/profile'
 import { getMyGroups, createGroup, joinGroupByCode, leaveGroup } from './lib/groups'
 import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotification } from './lib/prayers'
@@ -41,6 +42,8 @@ export default function App() {
 
   const loadData = useCallback(async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
       const profile = await getMyProfile()
       if (!profile) return
       setUser(profile)
@@ -211,7 +214,7 @@ export default function App() {
   if (!ready) return <Splash />
 
   if (!user) {
-    return <Welcome onAuthSuccess={loadData} />
+    return <Welcome onAuthSuccess={() => {}} />
   }
 
   const screenProps = { user, prayers, groups }
