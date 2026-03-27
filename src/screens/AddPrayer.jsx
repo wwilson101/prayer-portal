@@ -53,7 +53,7 @@ export default function AddPrayer({ user, groups, onSave, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col animate-fade-in" style={{ maxWidth: 430, left: '50%', transform: 'translateX(-50%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col animate-fade-in" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
       {/* Full screen overlay bg */}
       <div
         style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 50%, #ede9fe 100%)' }}
