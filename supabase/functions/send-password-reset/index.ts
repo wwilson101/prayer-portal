@@ -19,16 +19,9 @@ Deno.serve(async (req: Request) => {
     console.log("Raw request body:", rawText);
     let body: any = {};
     try { body = JSON.parse(rawText); } catch { body = {}; }
-    const email = body?.email || body?.Email || body?.EMAIL;
-    console.log("Received email:", email);
-
-    if (!email || typeof email !== "string") {
-      console.error("No email found in body:", rawText);
-      return new Response(JSON.stringify({ error: "Email is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const emailFromBody = body?.email || body?.Email || body?.EMAIL;
+    const userId = body?.userId || body?.user_id;
+    console.log("Received email:", emailFromBody, "userId:", userId);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -39,15 +32,31 @@ Deno.serve(async (req: Request) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    if (listError) {
-      console.error("List users error:", listError);
-      return new Response(JSON.stringify({ success: true }), {
+    let targetUser: any = null;
+
+    if (userId) {
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+      if (userError) {
+        console.error("Get user by ID error:", userError);
+      } else {
+        targetUser = userData.user;
+      }
+    } else if (emailFromBody) {
+      const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError) {
+        console.error("List users error:", listError);
+      } else {
+        targetUser = users.users.find(u => u.email?.toLowerCase() === emailFromBody.toLowerCase());
+      }
+    } else {
+      console.error("No email or userId in body:", rawText);
+      return new Response(JSON.stringify({ error: "Email or userId is required" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const targetUser = users.users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    const email = emailFromBody;
 
     if (!targetUser) {
       console.log("No user found with email:", email);
