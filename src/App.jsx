@@ -255,6 +255,11 @@ export default function App() {
           onCreateGroup={handleCreateGroup}
           onJoinGroup={handleJoinGroup}
           onLeaveGroup={handleLeaveGroup}
+          onGroupsChange={(groupId, memberId) => {
+            setGroups(prev => prev.map(g =>
+              g.id === groupId ? { ...g, members: g.members.filter(m => m.id !== memberId) } : g
+            ))
+          }}
         />
       )}
       {activeTab === 'profile' && (

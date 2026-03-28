@@ -38,11 +38,21 @@ export const adminGetAllGroups = async () => {
   if (!groups.length) return []
 
   const groupIds = groups.map(g => g.id)
-  const { data: members, error: memberError } = await supabase
-    .from('group_members')
-    .select('group_id, user_id, joined_at, profiles(name)')
-    .in('group_id', groupIds)
-  if (memberError) throw memberError
+  const [membersRes, groupAdminsRes] = await Promise.all([
+    supabase
+      .from('group_members')
+      .select('group_id, user_id, joined_at, profiles(name)')
+      .in('group_id', groupIds),
+    supabase
+      .from('group_admins')
+      .select('group_id, user_id, granted_at, profiles!group_admins_user_id_fkey(name)')
+      .in('group_id', groupIds),
+  ])
+
+  if (membersRes.error) throw membersRes.error
+
+  const members = membersRes.data || []
+  const groupAdmins = groupAdminsRes.data || []
 
   return groups.map(g => ({
     id: g.id,
@@ -54,6 +64,9 @@ export const adminGetAllGroups = async () => {
     members: members
       .filter(m => m.group_id === g.id)
       .map(m => ({ id: m.user_id, name: m.profiles?.name || 'Unknown', joinedAt: m.joined_at })),
+    groupAdminIds: groupAdmins
+      .filter(ga => ga.group_id === g.id)
+      .map(ga => ga.user_id),
   }))
 }
 
@@ -130,4 +143,20 @@ export const adminGetUserProfile = async (userId) => {
     prayers: prayersRes.data || [],
     groups: (groupsRes.data || []).map(m => ({ id: m.group_id, name: m.groups?.name || 'Unknown', joinedAt: m.joined_at })),
   }
+}
+
+export const adminSetGroupAdmin = async (groupId, userId, grantedBy) => {
+  const { error } = await supabase
+    .from('group_admins')
+    .insert({ group_id: groupId, user_id: userId, granted_by: grantedBy })
+  if (error) throw error
+}
+
+export const adminRevokeGroupAdmin = async (groupId, userId) => {
+  const { error } = await supabase
+    .from('group_admins')
+    .delete()
+    .eq('group_id', groupId)
+    .eq('user_id', userId)
+  if (error) throw error
 }

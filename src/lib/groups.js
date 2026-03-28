@@ -109,3 +109,12 @@ export const leaveGroup = async (groupId) => {
 
   if (error) throw error
 }
+
+export const groupAdminRemoveMember = async (groupId, userId) => {
+  const { error } = await supabase
+    .from('group_members')
+    .delete()
+    .eq('group_id', groupId)
+    .eq('user_id', userId)
+  if (error) throw error
+}

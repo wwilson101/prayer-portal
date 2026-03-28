@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen, Mail, Eye, X, Phone, BookMarked, CircleCheck as CheckCircle } from 'lucide-react'
-import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser, adminSendPasswordReset, adminGetUserProfile } from '../lib/admin'
+import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen, Mail, Eye, X, Phone, BookMarked, CircleCheck as CheckCircle, ShieldCheck, ShieldOff } from 'lucide-react'
+import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser, adminSendPasswordReset, adminGetUserProfile, adminSetGroupAdmin, adminRevokeGroupAdmin } from '../lib/admin'
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers'
 
 function SectionHeader({ title, count, expanded, onToggle }) {
@@ -57,7 +57,7 @@ function UserProfileModal({ userId, currentUserId, onClose }) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-base font-bold" style={{ color: '#f0ede0' }}>{profile.name}</p>
                   {profile.is_admin && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#1a1204', color: '#a89060' }}>Admin</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#1a1204', color: '#a89060' }}>App Admin</span>
                   )}
                   {profile.id === currentUserId && (
                     <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#1a2e22', color: '#a89060' }}>You</span>
@@ -203,7 +203,9 @@ export default function Admin({ currentUserId }) {
     try {
       await adminRemoveUserFromGroup(groupId, userId)
       setGroups(prev => prev.map(g =>
-        g.id === groupId ? { ...g, members: g.members.filter(m => m.id !== userId) } : g
+        g.id === groupId
+          ? { ...g, members: g.members.filter(m => m.id !== userId), groupAdminIds: g.groupAdminIds.filter(id => id !== userId) }
+          : g
       ))
     } catch (err) {
       setError('Failed to remove member.')
@@ -246,6 +248,31 @@ export default function Admin({ currentUserId }) {
       setError('')
     } catch (err) {
       setError(`Failed to send reset email: ${err.message}`)
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleToggleGroupAdmin = async (groupId, userId, isCurrentlyAdmin) => {
+    setActionLoading(`gadmin-${groupId}-${userId}`)
+    try {
+      if (isCurrentlyAdmin) {
+        await adminRevokeGroupAdmin(groupId, userId)
+        setGroups(prev => prev.map(g =>
+          g.id === groupId
+            ? { ...g, groupAdminIds: g.groupAdminIds.filter(id => id !== userId) }
+            : g
+        ))
+      } else {
+        await adminSetGroupAdmin(groupId, userId, currentUserId)
+        setGroups(prev => prev.map(g =>
+          g.id === groupId
+            ? { ...g, groupAdminIds: [...g.groupAdminIds, userId] }
+            : g
+        ))
+      }
+    } catch (err) {
+      setError('Failed to update group admin status.')
     } finally {
       setActionLoading(null)
     }
@@ -319,10 +346,10 @@ export default function Admin({ currentUserId }) {
                         <span className="text-white text-xs font-bold">{getInitials(u.name)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-semibold truncate" style={{ color: '#f0ede0' }}>{u.name}</p>
                           {u.is_admin && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#1a1204', color: '#a89060' }}>Admin</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#1a1204', color: '#a89060' }}>App Admin</span>
                           )}
                           {u.id === currentUserId && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#1a2e22', color: '#a89060' }}>You</span>
@@ -408,22 +435,40 @@ export default function Admin({ currentUserId }) {
                         </button>
                       </div>
                       <div className="space-y-1.5">
-                        {g.members.map(m => (
-                          <div key={m.id} className="flex items-center gap-2 pl-1">
-                            <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${getAvatarColor(m.name)} flex items-center justify-center flex-shrink-0`}>
-                              <span className="text-white text-[8px] font-bold">{getInitials(m.name)}</span>
+                        {g.members.map(m => {
+                          const isGroupAdmin = g.groupAdminIds?.includes(m.id)
+                          return (
+                            <div key={m.id} className="flex items-center gap-2 pl-1">
+                              <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${getAvatarColor(m.name)} flex items-center justify-center flex-shrink-0`}>
+                                <span className="text-white text-[8px] font-bold">{getInitials(m.name)}</span>
+                              </div>
+                              <span className="text-xs flex-1 truncate" style={{ color: '#c8b99a' }}>{m.name}</span>
+                              {isGroupAdmin && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#0d1f15', color: '#6fcf97' }}>Group Admin</span>
+                              )}
+                              <button
+                                onClick={() => handleToggleGroupAdmin(g.id, m.id, isGroupAdmin)}
+                                disabled={actionLoading === `gadmin-${g.id}-${m.id}`}
+                                title={isGroupAdmin ? 'Revoke group admin' : 'Make group admin'}
+                                className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80 flex-shrink-0"
+                                style={isGroupAdmin
+                                  ? { background: '#0d1f15', color: '#6fcf97' }
+                                  : { background: '#1a1710', color: '#a89060' }
+                                }
+                              >
+                                {isGroupAdmin ? <ShieldOff size={11} /> : <ShieldCheck size={11} />}
+                              </button>
+                              <button
+                                onClick={() => handleRemoveMember(g.id, m.id, m.name)}
+                                disabled={actionLoading === `member-${g.id}-${m.id}`}
+                                className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80"
+                                style={{ color: '#a89060' }}
+                              >
+                                <UserMinus size={12} />
+                              </button>
                             </div>
-                            <span className="text-xs flex-1 truncate" style={{ color: '#c8b99a' }}>{m.name}</span>
-                            <button
-                              onClick={() => handleRemoveMember(g.id, m.id, m.name)}
-                              disabled={actionLoading === `member-${g.id}-${m.id}`}
-                              className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80"
-                              style={{ color: '#a89060' }}
-                            >
-                              <UserMinus size={12} />
-                            </button>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </div>
                   ))}

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock } from 'lucide-react';
+import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus } from 'lucide-react';
 import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
-import { generateId, generateGroupCode, getInitials, getAvatarColor, formatDate } from '../utils/helpers';
+import { getInitials, getAvatarColor, formatDate } from '../utils/helpers';
+import { groupAdminRemoveMember } from '../lib/groups';
 
 function GroupCard({ group, userId, onClick }) {
-  const isMember = group.members.some(m => m.id === userId);
   const isOwner = group.createdBy === userId;
   const memberCount = group.members.length;
 
@@ -22,7 +22,12 @@ function GroupCard({ group, userId, onClick }) {
             <h3 className="text-sm font-bold truncate" style={{ color: '#f0ede0' }}>{group.name}</h3>
             {isOwner && (
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>
-                Admin
+                Creator
+              </span>
+            )}
+            {group.isGroupAdmin && !isOwner && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 border" style={{ background: '#0d1f15', color: '#6fcf97', borderColor: '#1a3d28' }}>
+                Group Admin
               </span>
             )}
           </div>
@@ -58,14 +63,31 @@ function GroupCard({ group, userId, onClick }) {
   );
 }
 
-function GroupDetail({ group, userId, onClose, onLeave }) {
+function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
   const [copied, setCopied] = useState(false);
+  const [removingMember, setRemovingMember] = useState(null);
+  const [members, setMembers] = useState(group.members);
   const isOwner = group.createdBy === userId;
+  const canManageMembers = group.isGroupAdmin || isOwner;
 
   const copyCode = () => {
     navigator.clipboard?.writeText(group.code).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleRemoveMember = async (memberId, memberName) => {
+    if (!confirm(`Remove ${memberName} from this group?`)) return;
+    setRemovingMember(memberId);
+    try {
+      await groupAdminRemoveMember(group.id, memberId);
+      setMembers(prev => prev.filter(m => m.id !== memberId));
+      if (onMemberRemoved) onMemberRemoved(group.id, memberId);
+    } catch (err) {
+      console.error('Failed to remove member:', err);
+    } finally {
+      setRemovingMember(null);
+    }
   };
 
   return (
@@ -92,6 +114,7 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
               <div>
                 <h3 className="font-bold" style={{ color: '#f0ede0' }}>{group.name}</h3>
                 {isOwner && <span className="text-xs" style={{ color: '#a89060' }}>You created this group</span>}
+                {group.isGroupAdmin && !isOwner && <span className="text-xs" style={{ color: '#6fcf97' }}>You are a group admin</span>}
               </div>
             </div>
             {group.description && (
@@ -106,10 +129,7 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
               <button
                 onClick={copyCode}
                 className="px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all border"
-                style={copied
-                  ? { background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }
-                  : { background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }
-                }
+                style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}
               >
                 {copied ? <Check size={14} /> : <Copy size={14} />}
                 {copied ? 'Copied!' : 'Copy'}
@@ -120,11 +140,13 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
 
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#a89060' }}>
-              Members ({group.members.length})
+              Members ({members.length})
             </p>
             <div className="space-y-2">
-              {group.members.map(member => {
+              {members.map(member => {
                 const isMe = member.id === userId;
+                const isCreator = member.id === group.createdBy;
+                const canRemove = canManageMembers && !isMe && !isCreator;
                 return (
                   <div key={member.id} className="flex items-center gap-3 glass-card rounded-xl p-3">
                     <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarColor(member.name)} flex items-center justify-center shadow-sm`}>
@@ -136,8 +158,18 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
                       </p>
                       <p className="text-xs" style={{ color: '#c8b99a' }}>Joined {formatDate(member.joinedAt)}</p>
                     </div>
-                    {member.id === group.createdBy && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>Admin</span>
+                    {isCreator && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>Creator</span>
+                    )}
+                    {canRemove && (
+                      <button
+                        onClick={() => handleRemoveMember(member.id, member.name)}
+                        disabled={removingMember === member.id}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80 flex-shrink-0"
+                        style={{ background: '#1a1a1a', color: '#a89060' }}
+                      >
+                        <UserMinus size={13} />
+                      </button>
                     )}
                   </div>
                 );
@@ -145,7 +177,7 @@ function GroupDetail({ group, userId, onClose, onLeave }) {
             </div>
           </div>
 
-          {!isOwner && (
+          {!isOwner && !group.isGroupAdmin && (
             <button
               onClick={() => onLeave(group.id)}
               className="w-full py-3 rounded-xl text-sm font-semibold text-red-400 border border-red-800 hover:opacity-80 transition-colors"
@@ -293,13 +325,31 @@ function JoinGroupModal({ onClose, onJoin }) {
   );
 }
 
-export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLeaveGroup }) {
+export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLeaveGroup, onGroupsChange }) {
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
-  const isAdmin = !!user?.isAdmin;
-  const myGroups = groups.filter(g => g.members.some(m => m.id === user.id));
+  const isAppAdmin = !!user?.isAdmin;
+  const groupAdminIds = user?.groupAdminIds || [];
+  const canCreateGroups = isAppAdmin;
+
+  const myGroups = groups
+    .filter(g => g.members.some(m => m.id === user.id))
+    .map(g => ({
+      ...g,
+      isGroupAdmin: groupAdminIds.includes(g.id),
+    }));
+
+  const handleMemberRemoved = (groupId, memberId) => {
+    if (onGroupsChange) onGroupsChange(groupId, memberId);
+    if (selectedGroup?.id === groupId) {
+      setSelectedGroup(prev => ({
+        ...prev,
+        members: prev.members.filter(m => m.id !== memberId),
+      }));
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
@@ -312,7 +362,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
       </div>
 
       <div className="px-5 pt-4 flex gap-3">
-        {isAdmin && (
+        {canCreateGroups && (
           <button
             onClick={() => setShowCreate(true)}
             className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 text-sm"
@@ -323,7 +373,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
         )}
         <button
           onClick={() => setShowJoin(true)}
-          className={`btn-ghost flex items-center justify-center gap-2 text-sm py-3 ${isAdmin ? 'flex-1' : 'w-full'}`}
+          className={`btn-ghost flex items-center justify-center gap-2 text-sm py-3 ${canCreateGroups ? 'flex-1' : 'w-full'}`}
         >
           <LogIn size={16} />
           Join Group
@@ -369,6 +419,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
           userId={user.id}
           onClose={() => setSelectedGroup(null)}
           onLeave={(gid) => { onLeaveGroup(gid); setSelectedGroup(null); }}
+          onMemberRemoved={handleMemberRemoved}
         />
       )}
     </div>
