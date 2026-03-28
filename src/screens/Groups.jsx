@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus, Mail } from 'lucide-react';
+import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus, Mail, Send } from 'lucide-react';
 import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers';
 import { groupAdminRemoveMember } from '../lib/groups';
@@ -64,10 +64,104 @@ function GroupCard({ group, userId, onClick }) {
   );
 }
 
-function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
+function InviteEmailModal({ group, inviterName, onClose }) {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState('');
+
+  const handleSend = async () => {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError('Enter a valid email address');
+      return;
+    }
+    setStatus('sending');
+    setError('');
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const res = await fetch(`${supabaseUrl}/functions/v1/send-group-invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+        },
+        body: JSON.stringify({
+          recipientEmail: trimmed,
+          groupName: group.name,
+          groupCode: group.code,
+          groupDescription: group.description || '',
+          inviterName: inviterName || '',
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to send');
+      setStatus('sent');
+    } catch {
+      setStatus('idle');
+      setError('Failed to send invite. Please try again.');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center animate-fade-in px-5" style={{ maxWidth: 430, width: '100%', left: '50%', transform: 'translateX(-50%)' }}>
+      <div className="modal-overlay absolute inset-0" onClick={onClose} />
+      <div className="relative z-10 w-full glass-card rounded-2xl p-5 animate-slide-up">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-base" style={{ color: '#f0ede0' }}>Send Invite Email</h3>
+          <button onClick={onClose} className="w-7 h-7 rounded-full flex items-center justify-center border" style={{ background: '#111111', borderColor: '#2a2520' }}>
+            <X size={14} style={{ color: '#c8b99a' }} />
+          </button>
+        </div>
+
+        {status === 'sent' ? (
+          <div className="text-center py-4">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: '#0d1f15', border: '1px solid #1a3d28' }}>
+              <Check size={22} style={{ color: '#6fcf97' }} />
+            </div>
+            <p className="font-semibold mb-1" style={{ color: '#f0ede0' }}>Invite sent!</p>
+            <p className="text-sm" style={{ color: '#c8b99a' }}>They'll receive an email with the group code.</p>
+            <button onClick={onClose} className="btn-primary w-full mt-5">Done</button>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm mb-4" style={{ color: '#c8b99a' }}>
+              Enter the email address of the person you'd like to invite to <strong style={{ color: '#f0ede0' }}>{group.name}</strong>.
+            </p>
+            <div className="mb-4">
+              <label className="text-xs font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: '#a89060' }}>Email Address</label>
+              <input
+                type="email"
+                placeholder="friend@example.com"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setError(''); }}
+                className="input-field"
+                autoFocus
+                onKeyDown={e => e.key === 'Enter' && handleSend()}
+              />
+              {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            </div>
+            <div className="flex gap-3">
+              <button onClick={onClose} className="btn-ghost flex-1">Cancel</button>
+              <button
+                onClick={handleSend}
+                disabled={status === 'sending'}
+                className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {status === 'sending' ? 'Sending...' : <><Send size={14} />Send Invite</>}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GroupDetail({ group, userId, inviterName, onClose, onLeave, onMemberRemoved }) {
   const [copied, setCopied] = useState(false);
   const [removingMember, setRemovingMember] = useState(null);
   const [members, setMembers] = useState(group.members);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const isOwner = group.createdBy === userId;
   const canManageMembers = group.isGroupAdmin || isOwner;
 
@@ -75,47 +169,6 @@ function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
     navigator.clipboard?.writeText(group.code).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const sendInviteEmail = () => {
-    const appUrl = window.location.origin;
-    const subject = encodeURIComponent(`You're invited to join "${group.name}" on Prayer Portal`);
-    const body = encodeURIComponent(
-`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  PRAYER PORTAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-You've been invited to join a prayer group!
-
-GROUP: ${group.name}
-${group.description ? `\n"${group.description}"\n` : ''}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-YOUR INVITE CODE:
-
-  ★  ${group.code}  ★
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-HOW TO JOIN:
-  1. Tap the link below to open Prayer Portal:
-
-     ${appUrl}
-
-  2. Create your account (it's free)
-  3. Tap "Groups" in the bottom menu
-  4. Tap "Join Group"
-  5. Enter the code above: ${group.code}
-
-That's it — you're in! 🙏
-
-Prayer Portal is a private space to share prayer requests and lift each other up. Your group is a safe, trusted community.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  PRAYER PORTAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   const handleRemoveMember = async (memberId, memberName) => {
@@ -179,7 +232,7 @@ Prayer Portal is a private space to share prayer requests and lift each other up
             </div>
             <p className="text-xs mt-2 mb-3" style={{ color: '#c8b99a' }}>Share this code with others to join your group</p>
             <button
-              onClick={sendInviteEmail}
+              onClick={() => setShowInviteModal(true)}
               className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all border"
               style={{ background: '#0d1f15', color: '#6fcf97', borderColor: '#1a3d28' }}
             >
@@ -240,6 +293,13 @@ Prayer Portal is a private space to share prayer requests and lift each other up
           )}
         </div>
       </div>
+      {showInviteModal && (
+        <InviteEmailModal
+          group={group}
+          inviterName={inviterName}
+          onClose={() => setShowInviteModal(false)}
+        />
+      )}
     </div>
   );
 }
@@ -469,6 +529,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
         <GroupDetail
           group={selectedGroup}
           userId={user.id}
+          inviterName={user.name || ''}
           onClose={() => setSelectedGroup(null)}
           onLeave={(gid) => { onLeaveGroup(gid); setSelectedGroup(null); }}
           onMemberRemoved={handleMemberRemoved}
