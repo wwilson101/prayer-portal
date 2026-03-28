@@ -35,9 +35,17 @@ export const getSession = async () => {
 }
 
 export const sendPasswordReset = async (email) => {
-  const appUrl = window.location.origin
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/`,
-  })
-  if (error) throw error
+  const response = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/request-password-reset`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ email }),
+    }
+  )
+  const result = await response.json()
+  if (!response.ok) throw new Error(result.error || 'Failed to send reset email')
 }
