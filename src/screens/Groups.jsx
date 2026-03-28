@@ -78,10 +78,11 @@ function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
   };
 
   const sendInviteEmail = () => {
+    const appUrl = window.location.origin;
     const subject = encodeURIComponent(`You're invited to join "${group.name}" on Prayer Portal`);
     const body = encodeURIComponent(
 `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ✝  PRAYER PORTAL  ✝
+  PRAYER PORTAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 You've been invited to join a prayer group!
@@ -97,7 +98,10 @@ YOUR INVITE CODE:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 HOW TO JOIN:
-  1. Download / open Prayer Portal
+  1. Tap the link below to open Prayer Portal:
+
+     ${appUrl}
+
   2. Create your account (it's free)
   3. Tap "Groups" in the bottom menu
   4. Tap "Join Group"
@@ -108,7 +112,7 @@ That's it — you're in! 🙏
 Prayer Portal is a private space to share prayer requests and lift each other up. Your group is a safe, trusted community.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Prayer Portal — Pray Together, Stay Together
+  PRAYER PORTAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
     );
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
