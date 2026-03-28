@@ -97,7 +97,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Prayer Portal <onboarding@resend.dev>",
+        from: "Prayer Portal <noreply@teamwilsonllc.com>",
         to: [targetUser.user.email],
         subject: "Reset your Prayer Portal password",
         html: `
