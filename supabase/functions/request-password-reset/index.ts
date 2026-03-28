@@ -8,12 +8,17 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req: Request) => {
+  console.log("request-password-reset function invoked");
+
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
   }
 
   try {
-    const { email } = await req.json();
+    const body = await req.json();
+    const email = body?.email;
+    console.log("Received email:", email);
+
     if (!email || typeof email !== "string") {
       return new Response(JSON.stringify({ error: "Email is required" }), {
         status: 400,
@@ -21,9 +26,14 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    console.log("SUPABASE_URL present:", !!supabaseUrl);
+    console.log("SERVICE_ROLE_KEY present:", !!serviceRoleKey);
+
     const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      supabaseUrl!,
+      serviceRoleKey!,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
@@ -35,14 +45,19 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    console.log("Total users found:", users.users.length);
     const targetUser = users.users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    console.log("Target user found:", !!targetUser);
+
     if (!targetUser) {
+      console.log("No user found with email:", email);
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const appUrl = Deno.env.get("APP_URL") || "https://prayer-portal.bolt.host";
+    console.log("Using APP_URL:", appUrl);
 
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: "recovery",
@@ -57,8 +72,10 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    console.log("Reset link generated successfully");
     const resetLink = linkData.properties.action_link;
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    console.log("RESEND_API_KEY present:", !!resendApiKey);
 
     if (!resendApiKey) {
       console.error("RESEND_API_KEY not configured");
@@ -68,6 +85,7 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    console.log("Sending email via Resend to:", targetUser.email);
     const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -96,9 +114,12 @@ Deno.serve(async (req: Request) => {
       }),
     });
 
+    const resendResult = await emailRes.text();
+    console.log("Resend response status:", emailRes.status);
+    console.log("Resend response:", resendResult);
+
     if (!emailRes.ok) {
-      const errText = await emailRes.text();
-      console.error("Resend error:", errText);
+      console.error("Resend error:", resendResult);
     }
 
     return new Response(JSON.stringify({ success: true }), {
