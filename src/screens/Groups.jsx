@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus } from 'lucide-react';
+import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus, Mail } from 'lucide-react';
 import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers';
 import { groupAdminRemoveMember } from '../lib/groups';
@@ -77,6 +77,43 @@ function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const sendInviteEmail = () => {
+    const subject = encodeURIComponent(`You're invited to join "${group.name}" on Prayer Portal`);
+    const body = encodeURIComponent(
+`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✝  PRAYER PORTAL  ✝
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You've been invited to join a prayer group!
+
+GROUP: ${group.name}
+${group.description ? `\n"${group.description}"\n` : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR INVITE CODE:
+
+  ★  ${group.code}  ★
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HOW TO JOIN:
+  1. Download / open Prayer Portal
+  2. Create your account (it's free)
+  3. Tap "Groups" in the bottom menu
+  4. Tap "Join Group"
+  5. Enter the code above: ${group.code}
+
+That's it — you're in! 🙏
+
+Prayer Portal is a private space to share prayer requests and lift each other up. Your group is a safe, trusted community.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Prayer Portal — Pray Together, Stay Together
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
   const handleRemoveMember = async (memberId, memberName) => {
     if (!confirm(`Remove ${memberName} from this group?`)) return;
     setRemovingMember(memberId);
@@ -136,7 +173,15 @@ function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <p className="text-xs mt-1" style={{ color: '#c8b99a' }}>Share this code with others to join your group</p>
+            <p className="text-xs mt-2 mb-3" style={{ color: '#c8b99a' }}>Share this code with others to join your group</p>
+            <button
+              onClick={sendInviteEmail}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all border"
+              style={{ background: '#0d1f15', color: '#6fcf97', borderColor: '#1a3d28' }}
+            >
+              <Mail size={15} />
+              Send Invite Email
+            </button>
           </div>
 
           <div className="mb-4">
