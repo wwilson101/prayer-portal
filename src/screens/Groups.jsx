@@ -3,6 +3,7 @@ import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus } fro
 import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers';
 import { groupAdminRemoveMember } from '../lib/groups';
+import Tooltip from '../components/Tooltip';
 
 function GroupCard({ group, userId, onClick }) {
   const isOwner = group.createdBy === userId;
@@ -162,14 +163,16 @@ function GroupDetail({ group, userId, onClose, onLeave, onMemberRemoved }) {
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>Creator</span>
                     )}
                     {canRemove && (
-                      <button
-                        onClick={() => handleRemoveMember(member.id, member.name)}
-                        disabled={removingMember === member.id}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80 flex-shrink-0"
-                        style={{ background: '#1a1a1a', color: '#a89060' }}
-                      >
-                        <UserMinus size={13} />
-                      </button>
+                      <Tooltip label="Remove from group" position="left">
+                        <button
+                          onClick={() => handleRemoveMember(member.id, member.name)}
+                          disabled={removingMember === member.id}
+                          className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80 flex-shrink-0"
+                          style={{ background: '#1a1a1a', color: '#a89060' }}
+                        >
+                          <UserMinus size={13} />
+                        </button>
+                      </Tooltip>
                     )}
                   </div>
                 );

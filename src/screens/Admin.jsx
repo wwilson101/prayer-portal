@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Users, Shield, Trash2, UserMinus, RefreshCw, ChevronDown, ChevronUp, BookOpen, Mail, Eye, X, Phone, BookMarked, CircleCheck as CheckCircle, ShieldCheck, ShieldOff } from 'lucide-react'
 import { adminGetAllUsers, adminGetAllGroups, adminGetAllPrayers, adminSetAdmin, adminDeleteGroup, adminRemoveUserFromGroup, adminDeletePrayer, adminDeleteUser, adminSendPasswordReset, adminGetUserProfile, adminSetGroupAdmin, adminRevokeGroupAdmin } from '../lib/admin'
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers'
+import Tooltip from '../components/Tooltip'
 
 function SectionHeader({ title, count, expanded, onToggle }) {
   return (
@@ -358,45 +359,51 @@ export default function Admin({ currentUserId }) {
                         <p className="text-xs" style={{ color: '#c8b99a' }}>Joined {formatDate(u.created_at)}</p>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button
-                          onClick={() => setViewingUserId(u.id)}
-                          title="View profile"
-                          className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-80 transition-colors"
-                          style={{ background: '#1a1a2e', color: '#93c5fd' }}
-                        >
-                          <Eye size={13} />
-                        </button>
+                        <Tooltip label="View profile" position="top">
+                          <button
+                            onClick={() => setViewingUserId(u.id)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-80 transition-colors"
+                            style={{ background: '#1a1a2e', color: '#93c5fd' }}
+                          >
+                            <Eye size={13} />
+                          </button>
+                        </Tooltip>
                       </div>
                       {u.id !== currentUserId && (
                         <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <button
-                            onClick={() => handleToggleAdmin(u.id, u.is_admin)}
-                            disabled={actionLoading === `admin-${u.id}`}
-                            className="text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50"
-                            style={u.is_admin
-                              ? { background: '#1a1204', color: '#a89060' }
-                              : { background: '#111111', color: '#c8b99a' }
-                            }
-                          >
-                            {u.is_admin ? 'Revoke Admin' : 'Make Admin'}
-                          </button>
-                          <button
-                            onClick={() => handlePasswordReset(u.id, u.name)}
-                            disabled={actionLoading === `reset-${u.id}`}
-                            title="Send password reset email"
-                            className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50"
-                            style={{ background: '#111827', color: '#7dd3fc' }}
-                          >
-                            <Mail size={13} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteUser(u.id, u.name)}
-                            disabled={actionLoading === `delete-user-${u.id}`}
-                            className="w-7 h-7 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50"
-                            style={{ background: '#1a0808' }}
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          <Tooltip label={u.is_admin ? 'Revoke app admin' : 'Make app admin'} position="top">
+                            <button
+                              onClick={() => handleToggleAdmin(u.id, u.is_admin)}
+                              disabled={actionLoading === `admin-${u.id}`}
+                              className="text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                              style={u.is_admin
+                                ? { background: '#1a1204', color: '#a89060' }
+                                : { background: '#111111', color: '#c8b99a' }
+                              }
+                            >
+                              {u.is_admin ? 'Revoke Admin' : 'Make Admin'}
+                            </button>
+                          </Tooltip>
+                          <Tooltip label="Send password reset email" position="top">
+                            <button
+                              onClick={() => handlePasswordReset(u.id, u.name)}
+                              disabled={actionLoading === `reset-${u.id}`}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50"
+                              style={{ background: '#111827', color: '#7dd3fc' }}
+                            >
+                              <Mail size={13} />
+                            </button>
+                          </Tooltip>
+                          <Tooltip label="Delete user account" position="top">
+                            <button
+                              onClick={() => handleDeleteUser(u.id, u.name)}
+                              disabled={actionLoading === `delete-user-${u.id}`}
+                              className="w-7 h-7 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50"
+                              style={{ background: '#1a0808' }}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </Tooltip>
                         </div>
                       )}
                     </div>
@@ -425,14 +432,16 @@ export default function Admin({ currentUserId }) {
                           </div>
                           <p className="text-xs" style={{ color: '#c8b99a' }}>{g.members.length} member{g.members.length !== 1 ? 's' : ''} · {formatDate(g.createdAt)}</p>
                         </div>
-                        <button
-                          onClick={() => handleDeleteGroup(g.id, g.name)}
-                          disabled={actionLoading === `group-${g.id}`}
-                          className="ml-2 w-8 h-8 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50 flex-shrink-0"
-                          style={{ background: '#1a0808' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <Tooltip label="Delete group" position="top">
+                          <button
+                            onClick={() => handleDeleteGroup(g.id, g.name)}
+                            disabled={actionLoading === `group-${g.id}`}
+                            className="ml-2 w-8 h-8 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50 flex-shrink-0"
+                            style={{ background: '#1a0808' }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </Tooltip>
                       </div>
                       <div className="space-y-1.5">
                         {g.members.map(m => {
@@ -446,26 +455,29 @@ export default function Admin({ currentUserId }) {
                               {isGroupAdmin && (
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0" style={{ background: '#0d1f15', color: '#6fcf97' }}>Group Admin</span>
                               )}
-                              <button
-                                onClick={() => handleToggleGroupAdmin(g.id, m.id, isGroupAdmin)}
-                                disabled={actionLoading === `gadmin-${g.id}-${m.id}`}
-                                title={isGroupAdmin ? 'Revoke group admin' : 'Make group admin'}
-                                className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80 flex-shrink-0"
-                                style={isGroupAdmin
-                                  ? { background: '#0d1f15', color: '#6fcf97' }
-                                  : { background: '#1a1710', color: '#a89060' }
-                                }
-                              >
-                                {isGroupAdmin ? <ShieldOff size={11} /> : <ShieldCheck size={11} />}
-                              </button>
-                              <button
-                                onClick={() => handleRemoveMember(g.id, m.id, m.name)}
-                                disabled={actionLoading === `member-${g.id}-${m.id}`}
-                                className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80"
-                                style={{ color: '#a89060' }}
-                              >
-                                <UserMinus size={12} />
-                              </button>
+                              <Tooltip label={isGroupAdmin ? 'Revoke group admin' : 'Make group admin'} position="left">
+                                <button
+                                  onClick={() => handleToggleGroupAdmin(g.id, m.id, isGroupAdmin)}
+                                  disabled={actionLoading === `gadmin-${g.id}-${m.id}`}
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80 flex-shrink-0"
+                                  style={isGroupAdmin
+                                    ? { background: '#0d1f15', color: '#6fcf97' }
+                                    : { background: '#1a1710', color: '#a89060' }
+                                  }
+                                >
+                                  {isGroupAdmin ? <ShieldOff size={11} /> : <ShieldCheck size={11} />}
+                                </button>
+                              </Tooltip>
+                              <Tooltip label="Remove from group" position="left">
+                                <button
+                                  onClick={() => handleRemoveMember(g.id, m.id, m.name)}
+                                  disabled={actionLoading === `member-${g.id}-${m.id}`}
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 hover:opacity-80"
+                                  style={{ color: '#a89060' }}
+                                >
+                                  <UserMinus size={12} />
+                                </button>
+                              </Tooltip>
                             </div>
                           )
                         })}
@@ -498,14 +510,16 @@ export default function Admin({ currentUserId }) {
                         >
                           {p.status}
                         </span>
-                        <button
-                          onClick={() => handleDeletePrayer(p.id, p.title)}
-                          disabled={actionLoading === `prayer-${p.id}`}
-                          className="w-7 h-7 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50 flex-shrink-0"
-                          style={{ background: '#1a0808' }}
-                        >
-                          <Trash2 size={13} />
-                        </button>
+                        <Tooltip label="Delete prayer" position="top">
+                          <button
+                            onClick={() => handleDeletePrayer(p.id, p.title)}
+                            disabled={actionLoading === `prayer-${p.id}`}
+                            className="w-7 h-7 rounded-lg text-red-400 flex items-center justify-center hover:opacity-80 transition-colors disabled:opacity-50 flex-shrink-0"
+                            style={{ background: '#1a0808' }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </Tooltip>
                       </div>
                       <p className="text-xs" style={{ color: '#a89060' }}>By {p.ownerName} · {formatDate(p.requestDate)}</p>
                       <p className="text-xs mt-1 line-clamp-2" style={{ color: '#c8b99a' }}>{p.request}</p>
