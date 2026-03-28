@@ -15,11 +15,15 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const body = await req.json();
-    const email = body?.email;
+    const rawText = await req.text();
+    console.log("Raw request body:", rawText);
+    let body: any = {};
+    try { body = JSON.parse(rawText); } catch { body = {}; }
+    const email = body?.email || body?.Email || body?.EMAIL;
     console.log("Received email:", email);
 
     if (!email || typeof email !== "string") {
+      console.error("No email found in body:", rawText);
       return new Response(JSON.stringify({ error: "Email is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
