@@ -74,8 +74,10 @@ Deno.serve(async (req: Request) => {
     });
 
     if (linkError || !linkData?.properties?.action_link) {
-      console.error("Generate link error:", linkError);
-      return new Response(JSON.stringify({ success: true }), {
+      console.error("Generate link error:", JSON.stringify(linkError));
+      console.error("Link data:", JSON.stringify(linkData));
+      return new Response(JSON.stringify({ error: "Failed to generate reset link", details: linkError?.message }), {
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
