@@ -66,13 +66,62 @@ Deno.serve(async (req: Request) => {
     }
 
     const appUrl = Deno.env.get("APP_URL") || "https://prayer-portal.bolt.host";
-    const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
-      targetUser.user.email,
-      { redirectTo: `${appUrl}/update-password` }
-    );
 
-    if (resetError) {
-      return new Response(JSON.stringify({ error: resetError.message }), {
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email: targetUser.user.email,
+      options: { redirectTo: `${appUrl}/update-password` },
+    });
+
+    if (linkError || !linkData?.properties?.action_link) {
+      return new Response(JSON.stringify({ error: linkError?.message || "Failed to generate reset link" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const resetLink = linkData.properties.action_link;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+
+    if (!resendApiKey) {
+      return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const emailRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Prayer Portal <onboarding@resend.dev>",
+        to: [targetUser.user.email],
+        subject: "Reset your Prayer Portal password",
+        html: `
+          <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+            <h2 style="color: #1a1a1a;">Reset Your Password</h2>
+            <p style="color: #444; line-height: 1.6;">
+              You've been sent a password reset link for your Prayer Portal account.
+              Click the button below to set a new password.
+            </p>
+            <a href="${resetLink}" style="display: inline-block; margin: 24px 0; padding: 12px 24px; background: #16a34a; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600;">
+              Reset Password
+            </a>
+            <p style="color: #888; font-size: 13px;">
+              This link will expire in 1 hour. If you didn't request this, you can ignore this email.
+            </p>
+          </div>
+        `,
+      }),
+    });
+
+    if (!emailRes.ok) {
+      const errText = await emailRes.text();
+      console.error("Resend error:", errText);
+      return new Response(JSON.stringify({ error: "Failed to send email" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
