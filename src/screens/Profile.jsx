@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut } from 'lucide-react';
-import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
+import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {

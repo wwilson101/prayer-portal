@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Users, ChevronRight, X, Copy, Check, LogIn, Lock, UserMinus, Mail, Send } from 'lucide-react';
-import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
+import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor, formatDate } from '../utils/helpers';
 import { groupAdminRemoveMember } from '../lib/groups';
 import Tooltip from '../components/Tooltip';

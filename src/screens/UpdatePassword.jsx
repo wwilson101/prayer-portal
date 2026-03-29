@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png'
+import logo from '../assets/Prayer_Portal_logo.png'
 
 export default function UpdatePassword({ onDone }) {
   const [password, setPassword] = useState('')

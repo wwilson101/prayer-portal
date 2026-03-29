@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Search, ListFilter as Filter, Sparkles } from 'lucide-react';
-import logo from '../assets/ChatGPT_Image_Mar_27,_2026_at_03_24_46_PM.png';
+import logo from '../assets/Prayer_Portal_logo.png';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 
