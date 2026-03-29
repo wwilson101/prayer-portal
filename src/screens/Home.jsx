@@ -28,38 +28,36 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      <div className="header-bg px-5 pt-14 pb-4 sticky top-0 z-30">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-xs font-medium" style={{ color: '#a89060' }}>Good to see you,</p>
-            <h1 className="text-2xl font-bold gradient-text">{user.name.split(' ')[0]}</h1>
+      <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
+            <div>
+              <p className="text-[11px] font-medium leading-none mb-0.5" style={{ color: '#a89060' }}>Good to see you,</p>
+              <h1 className="text-xl font-bold gradient-text leading-none">{user.name.split(' ')[0]}</h1>
+            </div>
           </div>
-          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
-        </div>
-
-        <div className="flex gap-3 mb-4">
-          <div className="glass-card-blue rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-xl font-bold" style={{ color: '#f0ede0' }}>{activeCount}</span>
-            <span className="text-xs font-medium" style={{ color: '#c8b99a' }}>Active</span>
-          </div>
-          <div className="glass-card-purple rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-xl font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</span>
-            <span className="text-xs font-medium flex items-center gap-1" style={{ color: '#c8b99a' }}>
-              <Sparkles size={10} />
-              Answered
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="glass-card-blue rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+              <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{activeCount}</span>
+              <span className="text-[11px] font-medium" style={{ color: '#c8b99a' }}>Active</span>
+            </div>
+            <div className="glass-card-purple rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+              <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</span>
+              <Sparkles size={10} style={{ color: '#c8b99a' }} />
+            </div>
           </div>
         </div>
 
-        <div className="relative mb-3">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: '#a89060' }} />
+        <div className="relative mb-2.5">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#a89060' }} />
           <input
             type="text"
             placeholder="Search prayers..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="input-field py-2.5 text-sm"
-            style={{ paddingLeft: '2.25rem' }}
+            className="input-field py-2 text-sm"
+            style={{ paddingLeft: '2rem' }}
           />
         </div>
 

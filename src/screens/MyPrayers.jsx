@@ -23,31 +23,25 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-bold gradient-text">My Prayers</h1>
-          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
-        </div>
-        <p className="text-sm mb-4" style={{ color: '#c8b99a' }}>Your personal prayer journey</p>
-
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="glass-card-blue rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold" style={{ color: '#f0ede0' }}>{activeCount}</p>
-            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#c8b99a' }}>
-              <Clock size={9} />
-              Active
-            </p>
+      <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
+            <h1 className="text-xl font-bold gradient-text">My Prayers</h1>
           </div>
-          <div className="glass-card-purple rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</p>
-            <p className="text-[10px] font-medium flex items-center justify-center gap-1 mt-0.5" style={{ color: '#c8b99a' }}>
-              <Sparkles size={9} />
-              Answered
-            </p>
-          </div>
-          <div className="glass-card rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold" style={{ color: '#f0ede0' }}>{totalPraying}</p>
-            <p className="text-[10px] font-medium mt-0.5" style={{ color: '#c8b99a' }}>Praying</p>
+          <div className="flex items-center gap-2">
+            <div className="glass-card-blue rounded-xl px-3 py-1.5 text-center">
+              <p className="text-base font-bold leading-none" style={{ color: '#f0ede0' }}>{activeCount}</p>
+              <p className="text-[10px] flex items-center justify-center gap-0.5 mt-0.5" style={{ color: '#c8b99a' }}><Clock size={8} />Active</p>
+            </div>
+            <div className="glass-card-purple rounded-xl px-3 py-1.5 text-center">
+              <p className="text-base font-bold leading-none" style={{ color: '#f0ede0' }}>{answeredCount}</p>
+              <p className="text-[10px] flex items-center justify-center gap-0.5 mt-0.5" style={{ color: '#c8b99a' }}><Sparkles size={8} />Done</p>
+            </div>
+            <div className="glass-card rounded-xl px-3 py-1.5 text-center">
+              <p className="text-base font-bold leading-none" style={{ color: '#f0ede0' }}>{totalPraying}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: '#c8b99a' }}>Praying</p>
+            </div>
           </div>
         </div>
 

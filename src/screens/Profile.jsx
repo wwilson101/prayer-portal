@@ -38,23 +38,25 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      <div className="header-bg px-5 pt-14 pb-6 sticky top-0 z-30">
+      <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold gradient-text">Profile</h1>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
+            <h1 className="text-xl font-bold gradient-text">Profile</h1>
+          </div>
           <div className="flex items-center gap-2">
-          {saved && (
-            <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>
-              <Check size={12} />
-              Saved!
-            </span>
-          )}
-          {emailPending && (
-            <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2010', color: '#e8a040', borderColor: '#5a3a10' }}>
-              <Mail size={12} />
-              Check your email
-            </span>
-          )}
-          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
+            {saved && (
+              <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }}>
+                <Check size={12} />
+                Saved!
+              </span>
+            )}
+            {emailPending && (
+              <span className="text-xs px-3 py-1 rounded-full flex items-center gap-1 font-medium animate-scale-in border" style={{ background: '#1a2010', color: '#e8a040', borderColor: '#5a3a10' }}>
+                <Mail size={12} />
+                Check your email
+              </span>
+            )}
           </div>
         </div>
       </div>

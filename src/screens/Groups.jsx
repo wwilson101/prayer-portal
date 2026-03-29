@@ -465,31 +465,34 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      <div className="header-bg px-5 pt-14 pb-5 sticky top-0 z-30">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-bold gradient-text">Groups</h1>
-          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain" />
+      <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
+            <div>
+              <h1 className="text-xl font-bold gradient-text leading-none">Groups</h1>
+              <p className="text-[11px] mt-0.5" style={{ color: '#c8b99a' }}>Your prayer communities</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {canCreateGroups && (
+              <button
+                onClick={() => setShowCreate(true)}
+                className="btn-primary flex items-center justify-center gap-1.5 px-3 py-2 text-xs"
+              >
+                <Plus size={14} />
+                Create
+              </button>
+            )}
+            <button
+              onClick={() => setShowJoin(true)}
+              className="btn-ghost flex items-center justify-center gap-1.5 px-3 py-2 text-xs"
+            >
+              <LogIn size={14} />
+              Join
+            </button>
+          </div>
         </div>
-        <p className="text-sm" style={{ color: '#c8b99a' }}>Your prayer communities</p>
-      </div>
-
-      <div className="px-5 pt-4 flex gap-3">
-        {canCreateGroups && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 text-sm"
-          >
-            <Plus size={16} />
-            Create Group
-          </button>
-        )}
-        <button
-          onClick={() => setShowJoin(true)}
-          className={`btn-ghost flex items-center justify-center gap-2 text-sm py-3 ${canCreateGroups ? 'flex-1' : 'w-full'}`}
-        >
-          <LogIn size={16} />
-          Join Group
-        </button>
       </div>
 
       <div className="flex-1 px-4 pt-4 space-y-3">
