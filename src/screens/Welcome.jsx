@@ -205,8 +205,8 @@ export default function Welcome({ onAuthSuccess }) {
         <button onClick={() => setStep('landing')} className="flex items-center gap-1 text-sm mb-8 w-fit hover:opacity-80 transition-colors" style={{ color: '#c8b99a' }}>
           <ArrowLeft size={16} /> Back
         </button>
-        <div className="mb-8">
-          <img src={logo} alt="Prayer Portal" className="w-20 h-20 object-contain mb-5" />
+        <div className="mb-8 flex flex-col items-center text-center">
+          <img src={logo} alt="Prayer Portal" className="w-60 h-60 object-contain mb-5" />
           <h2 className="text-2xl font-bold mb-1" style={{ color: '#f0ede0' }}>Welcome back</h2>
           <p className="text-sm" style={{ color: '#c8b99a' }}>Sign in to your account</p>
         </div>
