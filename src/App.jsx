@@ -11,6 +11,7 @@ import Admin from './screens/Admin'
 import AddPrayer from './screens/AddPrayer'
 import UpdatePassword from './screens/UpdatePassword'
 import BottomNav from './components/BottomNav'
+import InstallPrompt from './components/InstallPrompt'
 
 import { onAuthStateChange, signOut } from './lib/auth'
 import { supabase } from './lib/supabase'
@@ -273,6 +274,7 @@ export default function App() {
         <Admin currentUserId={user.id} />
       )}
 
+      <InstallPrompt />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} isAdmin={!!user?.isAdmin} />
 
       {showAddPrayer && (
