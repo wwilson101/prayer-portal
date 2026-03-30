@@ -473,11 +473,12 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
             <p className="text-[11px] mt-0.5" style={{ color: '#c8b99a' }}>Your prayer communities</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2 w-full">
           {canCreateGroups && (
             <button
               onClick={() => setShowCreate(true)}
-              className="btn-primary flex items-center justify-center gap-1.5 px-5 py-2 text-xs"
+              className="btn-primary flex items-center justify-center gap-1.5 text-xs"
+              style={{ width: '7rem', height: '2.5rem' }}
             >
               <Plus size={14} />
               Create
@@ -485,7 +486,8 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
           )}
           <button
             onClick={() => setShowJoin(true)}
-            className="btn-ghost flex items-center justify-center gap-1.5 px-5 py-2 text-xs"
+            className="btn-ghost flex items-center justify-center gap-1.5 text-xs"
+            style={{ width: '14rem', height: '2.5rem' }}
           >
             <LogIn size={14} />
             Join
