@@ -115,26 +115,28 @@ export default function PrayerDetail({ prayer, groups, currentUserId, onClose, o
           )}
 
           <div className="space-y-3">
-            <button
-              onClick={() => { onPray(prayer.id); }}
-              className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 border"
-              style={hasPrayed
-                ? { background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }
-                : undefined
-              }
-            >
-              {hasPrayed ? (
-                <>
-                  <Heart size={16} style={{ fill: '#a89060', color: '#a89060' }} />
-                  <span style={{ color: '#a89060' }}>You're praying — Tap to remove</span>
-                </>
-              ) : (
-                <span className="btn-primary flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-sm">
-                  <Heart size={16} style={{ fill: 'white' }} />
-                  I'm Praying for This
-                </span>
-              )}
-            </button>
+            {!isAnswered && (
+              <button
+                onClick={() => { onPray(prayer.id); }}
+                className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 border"
+                style={hasPrayed
+                  ? { background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }
+                  : undefined
+                }
+              >
+                {hasPrayed ? (
+                  <>
+                    <Heart size={16} style={{ fill: '#a89060', color: '#a89060' }} />
+                    <span style={{ color: '#a89060' }}>You're praying — Tap to remove</span>
+                  </>
+                ) : (
+                  <span className="btn-primary flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-sm">
+                    <Heart size={16} style={{ fill: 'white' }} />
+                    I'm Praying for This
+                  </span>
+                )}
+              </button>
+            )}
 
             {isOwner && !isAnswered && (
               <button

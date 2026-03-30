@@ -74,23 +74,26 @@ export default function PrayerCard({ prayer, groups, currentUserId, onPray, onCl
       )}
 
       <div className="flex items-center justify-between mt-1">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onPray && onPray(prayer.id);
-          }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 border"
-          style={hasPrayed
-            ? { background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }
-            : { background: '#111111', color: '#c8b99a', borderColor: '#2a2520' }
-          }
-        >
-          <Heart
-            size={13}
-            style={hasPrayed ? { fill: '#a89060', color: '#a89060' } : {}}
-          />
-          {prayerCount > 0 ? `${prayerCount} praying` : 'Pray'}
-        </button>
+        {!isAnswered && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onPray && onPray(prayer.id);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 border"
+            style={hasPrayed
+              ? { background: '#1a2e22', color: '#a89060', borderColor: '#2d5a3d' }
+              : { background: '#111111', color: '#c8b99a', borderColor: '#2a2520' }
+            }
+          >
+            <Heart
+              size={13}
+              style={hasPrayed ? { fill: '#a89060', color: '#a89060' } : {}}
+            />
+            {prayerCount > 0 ? `${prayerCount} praying` : 'Pray'}
+          </button>
+        )}
+        {isAnswered && <span />}
 
         {isAnswered && (
           <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: '#a89060' }}>
