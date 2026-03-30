@@ -100,6 +100,11 @@ export const markAnswered = async (prayerId, note = '') => {
   if (error) throw error
 
   await supabase
+    .from('prayer_prays')
+    .delete()
+    .eq('prayer_id', prayerId)
+
+  await supabase
     .from('prayer_notifications_sent')
     .delete()
     .eq('prayer_id', prayerId)
