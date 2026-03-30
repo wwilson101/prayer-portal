@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, CircleCheck as CheckCircle2, Clock, Sparkles, ListFilter as Filter, ChevronDown, Check } from 'lucide-react';
+import { Plus, CircleCheck as CheckCircle2, ListFilter as Filter, ChevronDown, Check } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
@@ -33,10 +33,6 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
 
   const activeCount = prayers.filter(p => p.ownerId === user.id && p.status === 'active').length;
   const answeredCount = prayers.filter(p => p.ownerId === user.id && p.status === 'answered').length;
-  const totalPraying = prayers
-    .filter(p => p.ownerId === user.id)
-    .reduce((sum, p) => sum + (p.prayedBy?.length || 0), 0);
-
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-6 pb-3 sticky top-0 z-30">
@@ -44,21 +40,6 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
           <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
           <h1 className="text-xl font-bold gradient-text">My Prayers</h1>
         </div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="glass-card-blue rounded-xl px-3 py-1.5 flex items-center gap-1.5">
-            <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{activeCount}</span>
-            <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#c8b99a' }}><Clock size={8} />Active</span>
-          </div>
-          <div className="glass-card-purple rounded-xl px-3 py-1.5 flex items-center gap-1.5">
-            <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</span>
-            <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#c8b99a' }}><Sparkles size={8} />Answered</span>
-          </div>
-          <div className="glass-card rounded-xl px-3 py-1.5 flex items-center gap-1.5">
-            <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{totalPraying}</span>
-            <span className="text-[10px]" style={{ color: '#c8b99a' }}>Praying</span>
-          </div>
-        </div>
-
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
             {[['active', 'Active', activeCount], ['answered', 'Answered', answeredCount]].map(([val, label, count]) => (
