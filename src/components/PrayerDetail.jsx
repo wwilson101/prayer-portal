@@ -1,7 +1,7 @@
-import { X, CircleCheck as CheckCircle2, Heart, Clock, Users, Mail, Phone, Calendar } from 'lucide-react';
+import { X, CircleCheck as CheckCircle2, Heart, Clock, Users, Mail, Phone, Trash2 } from 'lucide-react';
 import { formatDate, formatDateFull, getInitials, getAvatarColor } from '../utils/helpers';
 
-export default function PrayerDetail({ prayer, groups, currentUserId, onClose, onPray, onMarkAnswered }) {
+export default function PrayerDetail({ prayer, groups, currentUserId, onClose, onPray, onMarkAnswered, canDelete, onDelete }) {
   if (!prayer) return null;
 
   const isAnswered = prayer.status === 'answered';
@@ -144,6 +144,17 @@ export default function PrayerDetail({ prayer, groups, currentUserId, onClose, o
               >
                 <CheckCircle2 size={16} />
                 Mark as Answered
+              </button>
+            )}
+
+            {canDelete && (
+              <button
+                onClick={() => onDelete(prayer.id)}
+                className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 border hover:opacity-80 transition-colors"
+                style={{ background: '#1a0808', color: '#f87171', borderColor: '#7f1d1d' }}
+              >
+                <Trash2 size={16} />
+                Delete Prayer
               </button>
             )}
           </div>

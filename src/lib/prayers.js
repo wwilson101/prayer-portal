@@ -121,6 +121,14 @@ export const removePray = async (prayerId, userId) => {
   if (error) throw error
 }
 
+export const deletePrayer = async (prayerId) => {
+  const { error } = await supabase
+    .from('prayers')
+    .delete()
+    .eq('id', prayerId)
+  if (error) throw error
+}
+
 export const sendPrayNotification = async ({ prayerId, prayerOwnerId, prayerOwnerPhone, prayerOwnerName, prayerTitle, prayerByName }) => {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return

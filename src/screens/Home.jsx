@@ -4,14 +4,23 @@ import logo from '../assets/Prayer_Portal_logo.png';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 
-export default function Home({ user, prayers, groups, onPray, onMarkAnswered, onAddPrayer }) {
+export default function Home({ user, prayers, groups, onPray, onMarkAnswered, onAddPrayer, onDeletePrayer }) {
   const [selectedPrayer, setSelectedPrayer] = useState(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('active');
 
+  const groupAdminIds = user?.groupAdminIds || []
+  const ownedGroupIds = groups.filter(g => g.createdBy === user.id).map(g => g.id)
+
   const myGroupIds = groups
     .filter(g => g.members.some(m => m.id === user.id))
-    .map(g => g.id);
+    .map(g => g.id)
+
+  const canDeletePrayer = (prayer) => {
+    if (user?.isAdmin) return true
+    if (prayer.ownerId === user.id) return true
+    return prayer.groupIds?.some(gid => ownedGroupIds.includes(gid) || groupAdminIds.includes(gid))
+  };
 
   const visiblePrayers = prayers
     .filter(p => p.groupIds?.some(gid => myGroupIds.includes(gid)))
@@ -130,6 +139,8 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
           onClose={() => setSelectedPrayer(null)}
           onPray={(id) => { onPray(id); setSelectedPrayer(p => p && p.id === id ? { ...p, prayedBy: p.prayedBy.includes(user.id) ? p.prayedBy.filter(x => x !== user.id) : [...p.prayedBy, user.id] } : p); }}
           onMarkAnswered={(id) => { onMarkAnswered(id); setSelectedPrayer(null); }}
+          canDelete={canDeletePrayer(selectedPrayer)}
+          onDelete={(id) => { onDeletePrayer(id); setSelectedPrayer(null); }}
         />
       )}
     </div>

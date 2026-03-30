@@ -17,7 +17,7 @@ import { onAuthStateChange, signOut } from './lib/auth'
 import { supabase } from './lib/supabase'
 import { getMyProfile, updateProfile, updateEmail } from './lib/profile'
 import { getMyGroups, createGroup, joinGroupByCode, leaveGroup } from './lib/groups'
-import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotification } from './lib/prayers'
+import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotification, deletePrayer } from './lib/prayers'
 
 function Splash() {
   return (
@@ -142,6 +142,17 @@ export default function App() {
     }
   }
 
+  const handleDeletePrayer = async (prayerId) => {
+    if (!window.confirm('Delete this prayer request? This cannot be undone.')) return
+    setPrayers(prev => prev.filter(p => p.id !== prayerId))
+    try {
+      await deletePrayer(prayerId)
+    } catch (err) {
+      console.error('Failed to delete prayer:', err)
+      await loadData()
+    }
+  }
+
   const handleAddPrayer = async (data) => {
     if (!user) return
     try {
@@ -240,6 +251,7 @@ export default function App() {
           onPray={handlePray}
           onMarkAnswered={handleMarkAnswered}
           onAddPrayer={() => setShowAddPrayer(true)}
+          onDeletePrayer={handleDeletePrayer}
         />
       )}
       {activeTab === 'my-prayers' && (
@@ -248,6 +260,7 @@ export default function App() {
           onPray={handlePray}
           onMarkAnswered={handleMarkAnswered}
           onAddPrayer={() => setShowAddPrayer(true)}
+          onDeletePrayer={handleDeletePrayer}
         />
       )}
       {activeTab === 'groups' && (

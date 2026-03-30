@@ -5,7 +5,7 @@ import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
 import MarkAnsweredModal from '../components/MarkAnsweredModal';
 
-export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswered, onAddPrayer }) {
+export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswered, onAddPrayer, onDeletePrayer }) {
   const [selectedPrayer, setSelectedPrayer] = useState(null);
   const [markingAnswered, setMarkingAnswered] = useState(null);
   const [filter, setFilter] = useState('all');
@@ -119,6 +119,8 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
           onClose={() => setSelectedPrayer(null)}
           onPray={onPray}
           onMarkAnswered={(id) => { setSelectedPrayer(null); setMarkingAnswered(prayers.find(p => p.id === id)); }}
+          canDelete={true}
+          onDelete={(id) => { onDeletePrayer(id); setSelectedPrayer(null); }}
         />
       )}
 
