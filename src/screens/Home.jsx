@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Search, ListFilter as Filter, Sparkles, ChevronDown, Check } from 'lucide-react';
+import { Plus, Search, ListFilter as Filter, ChevronDown, Check } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import PrayerCard from '../components/PrayerCard';
 import PrayerDetail from '../components/PrayerDetail';
@@ -51,23 +51,11 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-6 pb-3 sticky top-0 z-30">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
-            <div>
-              <p className="text-[11px] font-medium leading-none mb-0.5" style={{ color: '#a89060' }}>Good to see you,</p>
-              <h1 className="text-xl font-bold gradient-text leading-none">{user.name.split(' ')[0]}</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="glass-card-blue rounded-xl px-3 py-1.5 flex items-center gap-1.5">
-              <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{activeCount}</span>
-              <span className="text-[11px] font-medium" style={{ color: '#c8b99a' }}>Active</span>
-            </div>
-            <div className="glass-card-purple rounded-xl px-3 py-1.5 flex items-center gap-1.5">
-              <span className="text-base font-bold" style={{ color: '#f0ede0' }}>{answeredCount}</span>
-              <Sparkles size={10} style={{ color: '#c8b99a' }} />
-            </div>
+        <div className="flex items-center gap-3 mb-3">
+          <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
+          <div>
+            <p className="text-[11px] font-medium leading-none mb-0.5" style={{ color: '#a89060' }}>Good to see you,</p>
+            <h1 className="text-xl font-bold gradient-text leading-none">{user.name.split(' ')[0]}</h1>
           </div>
         </div>
 
@@ -85,11 +73,11 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
 
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
-            {[['active', 'Active'], ['answered', 'Answered']].map(([val, label]) => (
+            {[['active', 'Active', activeCount], ['answered', 'Answered', answeredCount]].map(([val, label, count]) => (
               <button
                 key={val}
                 onClick={() => setFilter(val)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   filter === val
                     ? 'gradient-bg-deep text-white shadow-sm'
                     : 'border'
@@ -97,6 +85,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
                 style={filter !== val ? { background: '#111111', color: '#c8b99a', borderColor: '#2a2520' } : {}}
               >
                 {label}
+                <span className={`text-[10px] font-bold ${filter === val ? 'opacity-80' : ''}`}>{count}</span>
               </button>
             ))}
           </div>

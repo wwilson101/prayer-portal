@@ -61,11 +61,11 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
 
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
-            {[['active', 'Active'], ['answered', 'Answered']].map(([val, label]) => (
+            {[['active', 'Active', activeCount], ['answered', 'Answered', answeredCount]].map(([val, label, count]) => (
               <button
                 key={val}
                 onClick={() => setFilter(val)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   filter === val
                     ? 'gradient-bg-deep text-white shadow-sm'
                     : 'border'
@@ -73,6 +73,7 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
                 style={filter !== val ? { background: '#111111', color: '#c8b99a', borderColor: '#2a2520' } : {}}
               >
                 {label}
+                <span className={`text-[10px] font-bold ${filter === val ? 'opacity-80' : ''}`}>{count}</span>
               </button>
             ))}
           </div>
