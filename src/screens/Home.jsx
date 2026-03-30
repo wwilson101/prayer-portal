@@ -31,7 +31,7 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
       <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
+            <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
             <div>
               <p className="text-[11px] font-medium leading-none mb-0.5" style={{ color: '#a89060' }}>Good to see you,</p>
               <h1 className="text-xl font-bold gradient-text leading-none">{user.name.split(' ')[0]}</h1>

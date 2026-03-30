@@ -466,32 +466,30 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
-            <div>
-              <h1 className="text-xl font-bold gradient-text leading-none">Groups</h1>
-              <p className="text-[11px] mt-0.5" style={{ color: '#c8b99a' }}>Your prayer communities</p>
-            </div>
+        <div className="flex items-center gap-3 mb-3">
+          <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
+          <div>
+            <h1 className="text-xl font-bold gradient-text leading-none">Groups</h1>
+            <p className="text-[11px] mt-0.5" style={{ color: '#c8b99a' }}>Your prayer communities</p>
           </div>
-          <div className="flex items-center gap-2">
-            {canCreateGroups && (
-              <button
-                onClick={() => setShowCreate(true)}
-                className="btn-primary flex items-center justify-center gap-1.5 px-3 py-2 text-xs"
-              >
-                <Plus size={14} />
-                Create
-              </button>
-            )}
+        </div>
+        <div className="flex items-center gap-2">
+          {canCreateGroups && (
             <button
-              onClick={() => setShowJoin(true)}
-              className="btn-ghost flex items-center justify-center gap-1.5 px-3 py-2 text-xs"
+              onClick={() => setShowCreate(true)}
+              className="btn-primary flex items-center justify-center gap-1.5 px-3 py-2 text-xs"
             >
-              <LogIn size={14} />
-              Join
+              <Plus size={14} />
+              Create
             </button>
-          </div>
+          )}
+          <button
+            onClick={() => setShowJoin(true)}
+            className="btn-ghost flex items-center justify-center gap-1.5 px-3 py-2 text-xs"
+          >
+            <LogIn size={14} />
+            Join
+          </button>
         </div>
       </div>
 

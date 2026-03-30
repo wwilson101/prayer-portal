@@ -41,7 +41,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
       <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Prayer Portal" className="w-9 h-9 object-contain" />
+            <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
             <h1 className="text-xl font-bold gradient-text">Profile</h1>
           </div>
           <div className="flex items-center gap-2">
