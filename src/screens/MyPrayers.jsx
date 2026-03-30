@@ -23,7 +23,7 @@ export default function MyPrayers({ user, prayers, groups, onPray, onMarkAnswere
 
   return (
     <div className="flex flex-col min-h-screen pb-24">
-      <div className="header-bg px-5 pt-12 pb-3 sticky top-0 z-30">
+      <div className="header-bg px-5 pt-6 pb-3 sticky top-0 z-30">
         <div className="flex items-center gap-3 mb-2">
           <img src={logo} alt="Prayer Portal" className="object-contain" style={{ width: '4.5rem', height: '4.5rem' }} />
           <h1 className="text-xl font-bold gradient-text">My Prayers</h1>
