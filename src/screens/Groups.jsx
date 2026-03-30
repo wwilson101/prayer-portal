@@ -477,7 +477,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
           {canCreateGroups && (
             <button
               onClick={() => setShowCreate(true)}
-              className="btn-primary flex items-center justify-center gap-1.5 w-24 py-2 text-xs"
+              className="btn-primary flex items-center justify-center gap-1.5 px-5 py-2 text-xs"
             >
               <Plus size={14} />
               Create
@@ -485,7 +485,7 @@ export default function Groups({ user, groups, onCreateGroup, onJoinGroup, onLea
           )}
           <button
             onClick={() => setShowJoin(true)}
-            className="btn-ghost flex items-center justify-center gap-1.5 w-24 py-2 text-xs"
+            className="btn-ghost flex items-center justify-center gap-1.5 px-5 py-2 text-xs"
           >
             <LogIn size={14} />
             Join
