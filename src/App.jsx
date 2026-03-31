@@ -61,10 +61,17 @@ export default function App() {
             const playerId = oneSignal.User.PushSubscription.id
             if (subscribed && playerId) {
               await saveOneSignalPlayerId(playerId)
+              return true
             }
+            return false
           }
 
-          await tryGetAndSave()
+          const saved = await tryGetAndSave()
+
+          if (!saved) {
+            await new Promise(r => setTimeout(r, 3000))
+            await tryGetAndSave()
+          }
 
           oneSignal.User.PushSubscription.addEventListener('change', async (event) => {
             const playerId = event?.current?.id
