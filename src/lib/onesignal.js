@@ -3,7 +3,19 @@ const ONESIGNAL_APP_ID = '88c00dad-fbdc-4b65-9f12-6108c045c57e'
 let _initialized = false
 let _initPromise = null
 
-const getOneSignal = () => window.OneSignalDeferred ? window.OneSignal : null
+const isIOS = () => {
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  )
+}
+
+const isPWA = () => {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  )
+}
 
 export const initOneSignal = () => {
   if (_initPromise) return _initPromise
@@ -49,14 +61,21 @@ export const initOneSignal = () => {
   return _initPromise
 }
 
-const waitForPlayerId = (OneSignal, timeoutMs = 8000) => {
+const withTimeout = (promise, ms, fallback = null) => {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ])
+}
+
+const waitForPlayerId = (OneSignal, timeoutMs = 10000) => {
   return new Promise((resolve) => {
     const start = Date.now()
     const poll = () => {
       const id = OneSignal.User?.PushSubscription?.id
       if (id) return resolve(id)
       if (Date.now() - start > timeoutMs) return resolve(null)
-      setTimeout(poll, 300)
+      setTimeout(poll, 400)
     }
     poll()
   })
@@ -64,22 +83,34 @@ const waitForPlayerId = (OneSignal, timeoutMs = 8000) => {
 
 export const requestPushPermission = async () => {
   try {
-    if (!('Notification' in window)) return null
+    const ios = isIOS()
+    const pwa = isPWA()
 
-    const current = Notification.permission
-    if (current === 'denied') return null
-
-    if (current !== 'granted') {
-      const result = await Notification.requestPermission()
-      if (result !== 'granted') return null
+    if (ios && !pwa) {
+      return null
     }
 
-    const OneSignal = await initOneSignal()
+    const OneSignal = await withTimeout(initOneSignal(), 10000, null)
     if (!OneSignal) return null
 
-    await OneSignal.User.PushSubscription.optIn()
+    if (!ios) {
+      if (!('Notification' in window)) return null
+      const current = Notification.permission
+      if (current === 'denied') return null
 
-    const playerId = await waitForPlayerId(OneSignal)
+      if (current !== 'granted') {
+        const result = await withTimeout(
+          Notification.requestPermission(),
+          15000,
+          'default'
+        )
+        if (result !== 'granted') return null
+      }
+    }
+
+    await withTimeout(OneSignal.User.PushSubscription.optIn(), 10000, null)
+
+    const playerId = await waitForPlayerId(OneSignal, 10000)
     return playerId || null
   } catch (err) {
     console.error('Push permission error:', err)
@@ -101,7 +132,8 @@ export const getPlayerId = async () => {
 
 export const isPushSubscribed = async () => {
   try {
-    if (Notification.permission !== 'granted') return false
+    const ios = isIOS()
+    if (!ios && Notification.permission !== 'granted') return false
     const OneSignal = window.OneSignal
     if (!OneSignal) return false
     return !!(OneSignal.User?.PushSubscription?.optedIn)
@@ -114,7 +146,7 @@ export const optOutPush = async () => {
   try {
     const OneSignal = window.OneSignal
     if (!OneSignal) return
-    await OneSignal.User.PushSubscription.optOut()
+    await withTimeout(OneSignal.User.PushSubscription.optOut(), 5000, null)
   } catch (err) {
     console.error('Push opt-out error:', err)
   }
@@ -122,13 +154,15 @@ export const optOutPush = async () => {
 
 export const optInPush = async () => {
   try {
-    const OneSignal = await initOneSignal()
+    const OneSignal = await withTimeout(initOneSignal(), 10000, null)
     if (!OneSignal) return null
-    await OneSignal.User.PushSubscription.optIn()
-    const playerId = await waitForPlayerId(OneSignal)
+    await withTimeout(OneSignal.User.PushSubscription.optIn(), 10000, null)
+    const playerId = await waitForPlayerId(OneSignal, 10000)
     return playerId || null
   } catch (err) {
     console.error('Push opt-in error:', err)
     return null
   }
 }
+
+export { isIOS, isPWA }
