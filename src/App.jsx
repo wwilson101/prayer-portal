@@ -53,10 +53,21 @@ export default function App() {
       const myPrayers = await getPrayers(groupIds)
       setPrayers(myPrayers)
 
-      initOneSignal().then(async () => {
-        const playerId = await getPlayerId()
-        if (playerId) {
-          await saveOneSignalPlayerId(playerId)
+      initOneSignal().then(async (oneSignal) => {
+        if (!oneSignal) return
+        try {
+          const subscribed = await oneSignal.User.PushSubscription.optedIn
+          if (subscribed) {
+            const playerId = await oneSignal.User.PushSubscription.id
+            if (playerId) {
+              await saveOneSignalPlayerId(playerId)
+            }
+          }
+        } catch {
+          const playerId = await getPlayerId()
+          if (playerId) {
+            await saveOneSignalPlayerId(playerId)
+          }
         }
       })
     } catch (err) {

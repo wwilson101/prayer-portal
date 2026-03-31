@@ -1,5 +1,7 @@
 const ONESIGNAL_APP_ID = '88c00dad-fbdc-4b65-9f12-6108c045c57e'
 
+let _oneSignalInstance = null
+
 export const initOneSignal = () => {
   return new Promise((resolve) => {
     if (typeof window === 'undefined') return resolve(null)
@@ -27,6 +29,7 @@ export const initOneSignal = () => {
             },
           },
         })
+        _oneSignalInstance = OneSignal
         resolve(OneSignal)
       } catch (err) {
         console.error('OneSignal init error:', err)
@@ -44,9 +47,11 @@ export const initOneSignal = () => {
   })
 }
 
+const getOneSignal = () => _oneSignalInstance || window.OneSignal || null
+
 export const requestPushPermission = async () => {
   try {
-    const OneSignal = window.OneSignal
+    const OneSignal = getOneSignal()
     if (!OneSignal) return null
     await OneSignal.Slidedown.promptPush()
     const permission = await OneSignal.Notifications.permission
@@ -61,7 +66,7 @@ export const requestPushPermission = async () => {
 
 export const getPlayerId = async () => {
   try {
-    const OneSignal = window.OneSignal
+    const OneSignal = getOneSignal()
     if (!OneSignal) return null
     const subscribed = await OneSignal.User.PushSubscription.optedIn
     if (!subscribed) return null
@@ -73,7 +78,7 @@ export const getPlayerId = async () => {
 
 export const isPushSubscribed = async () => {
   try {
-    const OneSignal = window.OneSignal
+    const OneSignal = getOneSignal()
     if (!OneSignal) return false
     return !!(await OneSignal.User.PushSubscription.optedIn)
   } catch {
