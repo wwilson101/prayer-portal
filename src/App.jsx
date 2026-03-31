@@ -57,8 +57,8 @@ export default function App() {
         if (!oneSignal) return
         try {
           const tryGetAndSave = async () => {
-            const subscribed = oneSignal.User.PushSubscription.optedIn
-            const playerId = oneSignal.User.PushSubscription.id
+            const subscribed = await oneSignal.User.PushSubscription.optedIn
+            const playerId = await oneSignal.User.PushSubscription.id
             if (subscribed && playerId) {
               await saveOneSignalPlayerId(playerId)
               return true
