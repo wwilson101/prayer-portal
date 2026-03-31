@@ -31,12 +31,13 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
       return;
     }
     const browserPermission = 'Notification' in window ? Notification.permission : 'default';
-    if (browserPermission === 'denied') {
+    const hasPlayerId = !!user.onesignalPlayerId;
+    if (browserPermission === 'denied' && !hasPlayerId) {
       setPushDenied(true);
       setPushSubscribed(false);
     } else {
       setPushDenied(false);
-      setPushSubscribed(!!user.onesignalPlayerId && browserPermission === 'granted');
+      setPushSubscribed(hasPlayerId && browserPermission === 'granted');
     }
   }, [user.onesignalPlayerId]);
 
