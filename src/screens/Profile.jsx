@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut, BellOff } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
+import { requestPushPermission, isPushSubscribed } from '../lib/onesignal';
+import { saveOneSignalPlayerId } from '../lib/profile';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {
   const [editing, setEditing] = useState(false);
@@ -9,6 +11,12 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const [saved, setSaved] = useState(false);
   const [emailPending, setEmailPending] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+
+  useEffect(() => {
+    isPushSubscribed().then(setPushSubscribed);
+  }, []);
 
   const myPrayers = prayers.filter(p => p.ownerId === user.id);
   const answeredPrayers = myPrayers.filter(p => p.status === 'answered');
@@ -17,6 +25,20 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
 
   const initials = getInitials(user.name);
   const avatarColor = getAvatarColor(user.name);
+
+  const handleTogglePush = async () => {
+    if (pushSubscribed) return;
+    setPushLoading(true);
+    try {
+      const playerId = await requestPushPermission();
+      if (playerId) {
+        await saveOneSignalPlayerId(playerId);
+        setPushSubscribed(true);
+      }
+    } finally {
+      setPushLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!form.name.trim() || !form.email.trim()) return;
@@ -157,12 +179,29 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         </div>
 
         <div className="glass-card rounded-2xl overflow-hidden">
+          <button
+            onClick={handleTogglePush}
+            disabled={pushSubscribed || pushLoading}
+            className="w-full flex items-center gap-3 px-4 py-3.5 transition-opacity disabled:cursor-default"
+          >
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#111111', color: pushSubscribed ? '#4a9e74' : '#a89060' }}>
+              {pushSubscribed ? <Bell size={16} /> : <BellOff size={16} />}
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold" style={{ color: '#f0ede0' }}>Push Notifications</p>
+              <p className="text-xs" style={{ color: '#c8b99a' }}>
+                {pushLoading ? 'Requesting permission...' : pushSubscribed ? 'Enabled — get notified when someone prays for you' : 'Tap to enable prayer notifications'}
+              </p>
+            </div>
+            {!pushSubscribed && !pushLoading && <ChevronRight size={14} style={{ color: '#a89060' }} />}
+            {pushSubscribed && <Check size={14} style={{ color: '#4a9e74' }} />}
+          </button>
+
           {[
-            { icon: Bell, label: 'Prayer Reminders', sub: user.phone ? 'Text reminders enabled' : 'Add phone to enable', color: '#a89060' },
             { icon: Shield, label: 'Privacy', sub: 'Your data stays in your groups', color: '#a89060' },
             { icon: Heart, label: 'Prayed for Others', sub: `${totalPraying} prayers lifted up`, color: '#f87171' },
-          ].map(({ icon: Icon, label, sub, color }, i) => (
-            <div key={label} className={`flex items-center gap-3 px-4 py-3.5 ${i > 0 ? 'border-t' : ''}`} style={i > 0 ? { borderColor: '#2a2520' } : {}}>
+          ].map(({ icon: Icon, label, sub, color }) => (
+            <div key={label} className="flex items-center gap-3 px-4 py-3.5 border-t" style={{ borderColor: '#2a2520' }}>
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#111111', color }}>
                 <Icon size={16} />
               </div>

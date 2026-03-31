@@ -7,20 +7,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
+const ONESIGNAL_APP_ID = "88c00dad-fbdc-4b65-9f12-6108c045c57e";
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
   }
 
   try {
-    const { prayerId, prayerOwnerId, prayerOwnerPhone, prayerOwnerName, prayerTitle, prayerByName } =
+    const { prayerId, prayerOwnerId, prayerOwnerName, prayerTitle, prayerByName, ownerPlayerId } =
       await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioFromNumber = Deno.env.get("TWILIO_FROM_NUMBER");
+    const oneSignalApiKey = Deno.env.get("ONESIGNAL_API_KEY");
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -66,43 +66,46 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    if (!twilioAccountSid || !twilioAuthToken || !twilioFromNumber) {
-      return new Response(JSON.stringify({ sent: false, reason: "twilio_not_configured" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    let resolvedPlayerId = ownerPlayerId;
+    if (!resolvedPlayerId && prayerOwnerId) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onesignal_player_id")
+        .eq("id", prayerOwnerId)
+        .maybeSingle();
+      resolvedPlayerId = profile?.onesignal_player_id || null;
     }
 
-    if (!prayerOwnerPhone) {
-      return new Response(JSON.stringify({ sent: false, reason: "no_phone_number" }), {
+    if (!resolvedPlayerId || !oneSignalApiKey) {
+      return new Response(JSON.stringify({ sent: false, reason: resolvedPlayerId ? "onesignal_not_configured" : "no_player_id" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const senderName = prayerByName || "Someone";
-    const message = `${senderName} is praying for you! "${prayerTitle}" — Prayer Portal`;
+    const notifBody = `${senderName} is praying for you!`;
 
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
-    const body = new URLSearchParams({
-      To: prayerOwnerPhone,
-      From: twilioFromNumber,
-      Body: message,
-    });
-
-    const twilioRes = await fetch(twilioUrl, {
+    const osRes = await fetch("https://onesignal.com/api/v1/notifications", {
       method: "POST",
       headers: {
-        Authorization: "Basic " + btoa(`${twilioAccountSid}:${twilioAuthToken}`),
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
+        "Authorization": `Key ${oneSignalApiKey}`,
       },
-      body: body.toString(),
+      body: JSON.stringify({
+        app_id: ONESIGNAL_APP_ID,
+        include_subscription_ids: [resolvedPlayerId],
+        headings: { en: "Prayer Portal" },
+        contents: { en: notifBody },
+        subtitle: { en: `"${prayerTitle}"` },
+        data: { prayerId, type: "pray" },
+      }),
     });
 
-    if (!twilioRes.ok) {
-      const errText = await twilioRes.text();
-      console.error("Twilio error:", errText);
-      return new Response(JSON.stringify({ sent: false, reason: "twilio_error" }), {
+    if (!osRes.ok) {
+      const errText = await osRes.text();
+      console.error("OneSignal error:", errText);
+      return new Response(JSON.stringify({ sent: false, reason: "onesignal_error" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

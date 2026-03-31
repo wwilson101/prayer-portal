@@ -15,9 +15,10 @@ import InstallPrompt from './components/InstallPrompt'
 
 import { onAuthStateChange, signOut } from './lib/auth'
 import { supabase } from './lib/supabase'
-import { getMyProfile, updateProfile, updateEmail } from './lib/profile'
+import { getMyProfile, updateProfile, updateEmail, saveOneSignalPlayerId } from './lib/profile'
 import { getMyGroups, createGroup, joinGroupByCode, leaveGroup } from './lib/groups'
 import { getPrayers, addPrayer, markAnswered, addPray, removePray, sendPrayNotification, deletePrayer } from './lib/prayers'
+import { initOneSignal, getPlayerId } from './lib/onesignal'
 
 function Splash() {
   return (
@@ -51,6 +52,13 @@ export default function App() {
       const groupIds = myGroups.map(g => g.id)
       const myPrayers = await getPrayers(groupIds)
       setPrayers(myPrayers)
+
+      initOneSignal().then(async () => {
+        const playerId = await getPlayerId()
+        if (playerId) {
+          await saveOneSignalPlayerId(playerId)
+        }
+      })
     } catch (err) {
       console.error('Failed to load data:', err)
     }
@@ -108,10 +116,10 @@ export default function App() {
           sendPrayNotification({
             prayerId: prayer.id,
             prayerOwnerId: prayer.ownerId,
-            prayerOwnerPhone: prayer.ownerPhone,
             prayerOwnerName: prayer.ownerName,
             prayerTitle: prayer.title,
             prayerByName: user.name,
+            ownerPlayerId: prayer.ownerPlayerId || null,
           })
         }
       }

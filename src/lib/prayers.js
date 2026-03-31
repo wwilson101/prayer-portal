@@ -15,7 +15,7 @@ export const getPrayers = async (myGroupIds) => {
 
   const { data: prayers, error: pError } = await supabase
     .from('prayers')
-    .select('*, profiles!prayers_owner_id_fkey(name, phone)')
+    .select('*, profiles!prayers_owner_id_fkey(name, phone, onesignal_player_id)')
     .in('id', prayerIds)
     .order('request_date', { ascending: false })
 
@@ -51,6 +51,7 @@ export const getPrayers = async (myGroupIds) => {
     ownerId: p.owner_id,
     ownerName: p.profiles?.name || 'Unknown',
     ownerPhone: p.profiles?.phone || '',
+    ownerPlayerId: p.profiles?.onesignal_player_id || null,
     ownerEmail: '',
     notifyOnPray: p.notify_on_pray || false,
     groupIds: groupMap[p.id] || [],
@@ -134,7 +135,7 @@ export const deletePrayer = async (prayerId) => {
   if (error) throw error
 }
 
-export const sendPrayNotification = async ({ prayerId, prayerOwnerId, prayerOwnerPhone, prayerOwnerName, prayerTitle, prayerByName }) => {
+export const sendPrayNotification = async ({ prayerId, prayerOwnerId, prayerOwnerName, prayerTitle, prayerByName, ownerPlayerId }) => {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return
 
@@ -149,7 +150,7 @@ export const sendPrayNotification = async ({ prayerId, prayerOwnerId, prayerOwne
         'Authorization': `Bearer ${session.access_token}`,
         'Apikey': anonKey,
       },
-      body: JSON.stringify({ prayerId, prayerOwnerId, prayerOwnerPhone, prayerOwnerName, prayerTitle, prayerByName }),
+      body: JSON.stringify({ prayerId, prayerOwnerId, prayerOwnerName, prayerTitle, prayerByName, ownerPlayerId }),
     })
   } catch (err) {
     console.error('Failed to send pray notification:', err)
