@@ -56,13 +56,22 @@ export default function App() {
       initOneSignal().then(async (oneSignal) => {
         if (!oneSignal) return
         try {
-          const subscribed = await oneSignal.User.PushSubscription.optedIn
-          if (subscribed) {
-            const playerId = await oneSignal.User.PushSubscription.id
-            if (playerId) {
+          const tryGetAndSave = async () => {
+            const subscribed = oneSignal.User.PushSubscription.optedIn
+            const playerId = oneSignal.User.PushSubscription.id
+            if (subscribed && playerId) {
               await saveOneSignalPlayerId(playerId)
             }
           }
+
+          await tryGetAndSave()
+
+          oneSignal.User.PushSubscription.addEventListener('change', async (event) => {
+            const playerId = event?.current?.id
+            if (playerId) {
+              await saveOneSignalPlayerId(playerId)
+            }
+          })
         } catch {
           const playerId = await getPlayerId()
           if (playerId) {
