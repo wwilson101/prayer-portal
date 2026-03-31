@@ -25,6 +25,11 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
       return;
     }
     setIosNoPwa(false);
+    if (ios) {
+      setPushDenied(false);
+      setPushSubscribed(!!user.onesignalPlayerId);
+      return;
+    }
     const browserPermission = 'Notification' in window ? Notification.permission : 'default';
     if (browserPermission === 'denied') {
       setPushDenied(true);
