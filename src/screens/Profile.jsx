@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut, BellOff } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
-import { requestPushPermission, optOutPush, optInPush } from '../lib/onesignal';
+import { requestPushPermission, optOutPush } from '../lib/onesignal';
 import { saveOneSignalPlayerId, clearOneSignalPlayerId } from '../lib/profile';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {
@@ -30,7 +30,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         await clearOneSignalPlayerId();
         setPushSubscribed(false);
       } else {
-        const playerId = await requestPushPermission() || await optInPush();
+        const playerId = await requestPushPermission();
         if (playerId) {
           await saveOneSignalPlayerId(playerId);
           setPushSubscribed(true);

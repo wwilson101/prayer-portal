@@ -59,19 +59,30 @@ export const initOneSignal = () => {
 
 const getOneSignal = () => _oneSignalInstance || window.OneSignal || null
 
-export const requestPushPermission = async () => {
-  try {
+export const requestPushPermission = () => {
+  return new Promise((resolve) => {
     const OneSignal = getOneSignal()
-    if (!OneSignal) return null
-    await OneSignal.Slidedown.promptPush()
-    const permission = await OneSignal.Notifications.permission
-    if (!permission) return null
-    const playerId = await OneSignal.User.PushSubscription.id
-    return playerId || null
-  } catch (err) {
-    console.error('Push permission error:', err)
-    return null
-  }
+    if (!OneSignal) return resolve(null)
+
+    const cleanup = () => {
+      OneSignal.Notifications.removeEventListener('permissionChange', onPermissionChange)
+    }
+
+    const onPermissionChange = async (granted) => {
+      cleanup()
+      if (!granted) return resolve(null)
+      const playerId = OneSignal.User.PushSubscription.id
+      resolve(playerId || null)
+    }
+
+    OneSignal.Notifications.addEventListener('permissionChange', onPermissionChange)
+
+    OneSignal.Slidedown.promptPush().catch((err) => {
+      console.error('Push prompt error:', err)
+      cleanup()
+      resolve(null)
+    })
+  })
 }
 
 export const getPlayerId = async () => {
