@@ -55,36 +55,37 @@ export default function App() {
 
       initOneSignal().then(async (oneSignal) => {
         if (!oneSignal) return
-        try {
-          const tryGetAndSave = async () => {
-            const subscribed = await oneSignal.User.PushSubscription.optedIn
-            const playerId = await oneSignal.User.PushSubscription.id
+
+        const trySave = async () => {
+          try {
+            const subscribed = oneSignal.User.PushSubscription.optedIn
+            const playerId = oneSignal.User.PushSubscription.id
             if (subscribed && playerId) {
               await saveOneSignalPlayerId(playerId)
               return true
             }
-            return false
-          }
-
-          const saved = await tryGetAndSave()
-
-          if (!saved) {
-            await new Promise(r => setTimeout(r, 3000))
-            await tryGetAndSave()
-          }
-
-          oneSignal.User.PushSubscription.addEventListener('change', async (event) => {
-            const playerId = event?.current?.id
+          } catch {
+            const playerId = await getPlayerId()
             if (playerId) {
               await saveOneSignalPlayerId(playerId)
+              return true
             }
-          })
-        } catch {
-          const playerId = await getPlayerId()
-          if (playerId) {
-            await saveOneSignalPlayerId(playerId)
           }
+          return false
         }
+
+        try {
+          oneSignal.User.PushSubscription.addEventListener('change', async (event) => {
+            const playerId = event?.current?.id
+            if (playerId) await saveOneSignalPlayerId(playerId)
+          })
+        } catch { /* ignore */ }
+
+        await trySave()
+        await new Promise(r => setTimeout(r, 2000))
+        await trySave()
+        await new Promise(r => setTimeout(r, 5000))
+        await trySave()
       })
     } catch (err) {
       console.error('Failed to load data:', err)
