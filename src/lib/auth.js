@@ -36,7 +36,6 @@ export const getSession = async () => {
 
 export const sendPasswordReset = async (email) => {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/request-password-reset`
-  console.log('Calling edge function:', url)
   let response
   try {
     response = await fetch(url, {
@@ -49,12 +48,9 @@ export const sendPasswordReset = async (email) => {
       body: JSON.stringify({ email }),
     })
   } catch (networkErr) {
-    console.error('Network error calling edge function:', networkErr)
     throw new Error('Network error: ' + networkErr.message)
   }
-  console.log('Edge function response status:', response.status)
   const text = await response.text()
-  console.log('Edge function response body:', text)
   let result
   try { result = JSON.parse(text) } catch { result = {} }
   if (!response.ok) throw new Error(result.error || 'Failed to send reset email')

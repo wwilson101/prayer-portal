@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react'
 import { X, Download } from 'lucide-react'
+import logo from '../assets/Prayer_Portal_logo.png'
+
+const APP_VERSION = '1.0'
+const DISMISSED_KEY = `installPromptDismissed_v${APP_VERSION}`
 
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
@@ -8,7 +12,7 @@ export default function InstallPrompt() {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    if (localStorage.getItem('installPromptDismissed')) return
+    if (localStorage.getItem(DISMISSED_KEY)) return
 
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
     const standalone = window.navigator.standalone === true
@@ -45,13 +49,13 @@ export default function InstallPrompt() {
   const handleDismiss = () => {
     setShowPrompt(false)
     setDismissed(true)
-    localStorage.setItem('installPromptDismissed', '1')
+    localStorage.setItem(DISMISSED_KEY, '1')
   }
 
   if (!showPrompt || dismissed) return null
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 z-50 animate-slide-up">
+    <div className="fixed bottom-24 left-4 right-4 z-40 animate-slide-up">
       <div
         className="rounded-2xl p-4 shadow-2xl border border-white/10"
         style={{ background: 'rgba(20, 20, 20, 0.96)', backdropFilter: 'blur(20px)' }}
@@ -65,7 +69,7 @@ export default function InstallPrompt() {
 
         <div className="flex items-center gap-3 pr-6">
           <img
-            src="/Screenshot_2026-03-27_at_8.26.27_PM.png"
+            src={logo}
             alt="Prayer Portal"
             className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
           />

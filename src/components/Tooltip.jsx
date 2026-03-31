@@ -1,8 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function Tooltip({ label, children, position = 'top' }) {
   const [visible, setVisible] = useState(false)
   const timer = useRef(null)
+
+  useEffect(() => {
+    return () => clearTimeout(timer.current)
+  }, [])
 
   const show = () => {
     clearTimeout(timer.current)

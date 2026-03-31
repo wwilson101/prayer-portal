@@ -28,6 +28,12 @@ export default function Home({ user, prayers, groups, onPray, onMarkAnswered, on
   const myGroups = groups.filter(g => g.members.some(m => m.id === user.id))
   const myGroupIds = myGroups.map(g => g.id)
 
+  useEffect(() => {
+    if (groupFilter !== 'all' && !myGroupIds.includes(groupFilter)) {
+      setGroupFilter('all');
+    }
+  }, [groups]);
+
   const canDeletePrayer = (prayer) => {
     if (user?.isAdmin) return true
     if (prayer.ownerId === user.id) return true

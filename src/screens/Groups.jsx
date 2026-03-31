@@ -160,6 +160,7 @@ function InviteEmailModal({ group, inviterName, onClose }) {
 function GroupDetail({ group, userId, inviterName, onClose, onLeave, onMemberRemoved }) {
   const [copied, setCopied] = useState(false);
   const [removingMember, setRemovingMember] = useState(null);
+  const [removeError, setRemoveError] = useState('');
   const [members, setMembers] = useState(group.members);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const isOwner = group.createdBy === userId;
@@ -174,12 +175,13 @@ function GroupDetail({ group, userId, inviterName, onClose, onLeave, onMemberRem
   const handleRemoveMember = async (memberId, memberName) => {
     if (!confirm(`Remove ${memberName} from this group?`)) return;
     setRemovingMember(memberId);
+    setRemoveError('');
     try {
       await groupAdminRemoveMember(group.id, memberId);
       setMembers(prev => prev.filter(m => m.id !== memberId));
       if (onMemberRemoved) onMemberRemoved(group.id, memberId);
     } catch (err) {
-      console.error('Failed to remove member:', err);
+      setRemoveError('Failed to remove member. Please try again.');
     } finally {
       setRemovingMember(null);
     }
@@ -240,6 +242,12 @@ function GroupDetail({ group, userId, inviterName, onClose, onLeave, onMemberRem
               Send Invite Email
             </button>
           </div>
+
+          {removeError && (
+            <div className="mb-3 px-3 py-2 rounded-xl text-xs text-red-400 border border-red-800" style={{ background: '#1a0808' }}>
+              {removeError}
+            </div>
+          )}
 
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#a89060' }}>
@@ -420,7 +428,7 @@ function JoinGroupModal({ onClose, onJoin }) {
               value={code}
               onChange={e => { setCode(e.target.value.toUpperCase()); setError(''); }}
               className="input-field text-2xl tracking-[0.4em] font-bold text-center uppercase"
-              maxLength={8}
+              maxLength={6}
             />
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>

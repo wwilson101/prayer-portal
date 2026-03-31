@@ -2,6 +2,7 @@ import { supabase } from './supabase'
 
 export const adminSendPasswordReset = async (userId) => {
   const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error('Not authenticated')
   const response = await fetch(
     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-password-reset`,
     {
@@ -105,6 +106,12 @@ export const adminDeleteGroup = async (groupId) => {
 }
 
 export const adminRemoveUserFromGroup = async (groupId, userId) => {
+  await supabase
+    .from('group_admins')
+    .delete()
+    .eq('group_id', groupId)
+    .eq('user_id', userId)
+
   const { error } = await supabase
     .from('group_members')
     .delete()

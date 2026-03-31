@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import './index.css'
 import logo from './assets/Prayer_Portal_logo.png'
 
@@ -39,6 +39,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [showAddPrayer, setShowAddPrayer] = useState(false)
   const [showUpdatePassword, setShowUpdatePassword] = useState(false)
+  const prayingRef = useRef(new Set())
 
   const loadData = useCallback(async () => {
     try {
@@ -123,9 +124,11 @@ export default function App() {
 
   const handlePray = async (prayerId) => {
     if (!user) return
+    if (prayingRef.current.has(prayerId)) return
     const prayer = prayers.find(p => p.id === prayerId)
     if (!prayer) return
     const hasPrayed = prayer.prayedBy?.includes(user.id)
+    prayingRef.current.add(prayerId)
     setPrayers(prev => prev.map(p => {
       if (p.id !== prayerId) return p
       return {
@@ -162,6 +165,8 @@ export default function App() {
             : p.prayedBy.filter(id => id !== user.id),
         }
       }))
+    } finally {
+      prayingRef.current.delete(prayerId)
     }
   }
 
@@ -199,6 +204,8 @@ export default function App() {
         userId: user.id,
         userName: user.name,
         userPhone: user.phone,
+        userEmail: user.email,
+        userPlayerId: user.onesignalPlayerId || null,
         notifyOnPray: data.notifyOnPray || false,
       })
       setPrayers(prev => [newPrayer, ...prev])
@@ -249,12 +256,12 @@ export default function App() {
 
   const handleUpdateUser = async (data) => {
     try {
-      await updateProfile({ name: data.name, phone: data.phone })
       const emailChanged = data.email && data.email.trim().toLowerCase() !== user.email?.toLowerCase()
+      await updateProfile({ name: data.name, phone: data.phone })
       if (emailChanged) {
         await updateEmail(data.email.trim())
       }
-      setUser(prev => ({ ...prev, ...data }))
+      setUser(prev => ({ ...prev, name: data.name, phone: data.phone, ...(emailChanged ? {} : { email: data.email }) }))
       if (data.name) {
         setPrayers(prev => prev.map(p =>
           p.ownerId === user.id ? { ...p, ownerName: data.name } : p

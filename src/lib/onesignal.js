@@ -1,4 +1,4 @@
-const ONESIGNAL_APP_ID = '88c00dad-fbdc-4b65-9f12-6108c045c57e'
+const ONESIGNAL_APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID
 
 let _initialized = false
 let _initPromise = null

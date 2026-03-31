@@ -13,20 +13,29 @@ export const getPrayers = async (myGroupIds) => {
 
   const prayerIds = [...new Set(pgRows.map(r => r.prayer_id))]
 
-  const { data: prayers, error: pError } = await supabase
-    .from('prayers')
-    .select('*, profiles!prayers_owner_id_fkey(name, phone, onesignal_player_id)')
-    .in('id', prayerIds)
-    .order('request_date', { ascending: false })
+  const [prayersRes, praysRes, emailsRes] = await Promise.all([
+    supabase
+      .from('prayers')
+      .select('*, profiles!prayers_owner_id_fkey(name, phone, onesignal_player_id)')
+      .in('id', prayerIds)
+      .order('request_date', { ascending: false }),
+    supabase
+      .from('prayer_prays')
+      .select('prayer_id, user_id')
+      .in('prayer_id', prayerIds),
+    supabase.rpc('get_member_emails'),
+  ])
 
-  if (pError) throw pError
+  if (prayersRes.error) throw prayersRes.error
+  if (praysRes.error) throw praysRes.error
 
-  const { data: prays, error: praysError } = await supabase
-    .from('prayer_prays')
-    .select('prayer_id, user_id')
-    .in('prayer_id', prayerIds)
+  const prayers = prayersRes.data
+  const prays = praysRes.data
 
-  if (praysError) throw praysError
+  const emailMap = {}
+  if (emailsRes.data) {
+    emailsRes.data.forEach(r => { emailMap[r.user_id] = r.email })
+  }
 
   const groupMap = {}
   pgRows.forEach(r => {
@@ -52,14 +61,14 @@ export const getPrayers = async (myGroupIds) => {
     ownerName: p.profiles?.name || 'Unknown',
     ownerPhone: p.profiles?.phone || '',
     ownerPlayerId: p.profiles?.onesignal_player_id || null,
-    ownerEmail: '',
+    ownerEmail: emailMap[p.owner_id] || '',
     notifyOnPray: p.notify_on_pray || false,
     groupIds: groupMap[p.id] || [],
     prayedBy: praysMap[p.id] || [],
   }))
 }
 
-export const addPrayer = async ({ title, request, groupIds, userId, userName, userPhone, notifyOnPray = false }) => {
+export const addPrayer = async ({ title, request, groupIds, userId, userName, userPhone, userEmail, userPlayerId, notifyOnPray = false }) => {
   const { data: prayer, error } = await supabase
     .rpc('add_prayer_with_groups', {
       p_title: title,
@@ -80,8 +89,9 @@ export const addPrayer = async ({ title, request, groupIds, userId, userName, us
     answeredNote: null,
     ownerId: userId,
     ownerName: userName,
-    ownerEmail: '',
+    ownerEmail: userEmail || '',
     ownerPhone: userPhone || '',
+    ownerPlayerId: userPlayerId || null,
     notifyOnPray: prayer.notify_on_pray || false,
     groupIds,
     prayedBy: [],
