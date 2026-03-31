@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut, BellOff } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
-import { requestPushPermission, isPushSubscribed, optOutPush, optInPush } from '../lib/onesignal';
+import { requestPushPermission, optOutPush, optInPush } from '../lib/onesignal';
 import { saveOneSignalPlayerId, clearOneSignalPlayerId } from '../lib/profile';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {
@@ -11,12 +11,8 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const [saved, setSaved] = useState(false);
   const [emailPending, setEmailPending] = useState(false);
   const [saveError, setSaveError] = useState('');
-  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushSubscribed, setPushSubscribed] = useState(!!user.onesignalPlayerId);
   const [pushLoading, setPushLoading] = useState(false);
-
-  useEffect(() => {
-    isPushSubscribed().then(setPushSubscribed);
-  }, []);
 
   const myPrayers = prayers.filter(p => p.ownerId === user.id);
   const answeredPrayers = myPrayers.filter(p => p.status === 'answered');
