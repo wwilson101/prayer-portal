@@ -6,8 +6,13 @@ export const initOneSignal = () => {
   return new Promise((resolve) => {
     if (typeof window === 'undefined') return resolve(null)
 
-    window.OneSignalDeferred = window.OneSignalDeferred || []
-    window.OneSignalDeferred.push(async (OneSignal) => {
+    if (_oneSignalInstance) return resolve(_oneSignalInstance)
+    if (window.OneSignal?.initialized) {
+      _oneSignalInstance = window.OneSignal
+      return resolve(window.OneSignal)
+    }
+
+    const doInit = async (OneSignal) => {
       try {
         await OneSignal.init({
           appId: ONESIGNAL_APP_ID,
@@ -35,7 +40,10 @@ export const initOneSignal = () => {
         console.error('OneSignal init error:', err)
         resolve(null)
       }
-    })
+    }
+
+    window.OneSignalDeferred = window.OneSignalDeferred || []
+    window.OneSignalDeferred.push(doInit)
 
     if (!document.getElementById('onesignal-sdk')) {
       const script = document.createElement('script')
@@ -43,6 +51,8 @@ export const initOneSignal = () => {
       script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'
       script.defer = true
       document.head.appendChild(script)
+    } else if (window.OneSignal) {
+      doInit(window.OneSignal)
     }
   })
 }
