@@ -1,40 +1,30 @@
 const ONESIGNAL_APP_ID = '88c00dad-fbdc-4b65-9f12-6108c045c57e'
 
-let _oneSignalInstance = null
+let _initialized = false
+let _initPromise = null
+
+const getOneSignal = () => window.OneSignalDeferred ? window.OneSignal : null
 
 export const initOneSignal = () => {
-  return new Promise((resolve) => {
+  if (_initPromise) return _initPromise
+
+  _initPromise = new Promise((resolve) => {
     if (typeof window === 'undefined') return resolve(null)
 
-    if (_oneSignalInstance) return resolve(_oneSignalInstance)
-    if (window.OneSignal?.initialized) {
-      _oneSignalInstance = window.OneSignal
-      return resolve(window.OneSignal)
-    }
+    if (_initialized && window.OneSignal) return resolve(window.OneSignal)
 
     const doInit = async (OneSignal) => {
       try {
-        await OneSignal.init({
-          appId: ONESIGNAL_APP_ID,
-          allowLocalhostAsSecureOrigin: true,
-          notifyButton: { enable: false },
-          promptOptions: {
-            slidedown: {
-              prompts: [
-                {
-                  type: 'push',
-                  autoPrompt: false,
-                  text: {
-                    actionMessage: 'Get notified when someone prays for you.',
-                    acceptButton: 'Allow',
-                    cancelButton: 'Not now',
-                  },
-                },
-              ],
-            },
-          },
-        })
-        _oneSignalInstance = OneSignal
+        if (!_initialized) {
+          await OneSignal.init({
+            appId: ONESIGNAL_APP_ID,
+            allowLocalhostAsSecureOrigin: true,
+            notifyButton: { enable: false },
+            autoRegister: false,
+            autoResubscribe: false,
+          })
+          _initialized = true
+        }
         resolve(OneSignal)
       } catch (err) {
         console.error('OneSignal init error:', err)
@@ -55,41 +45,53 @@ export const initOneSignal = () => {
       doInit(window.OneSignal)
     }
   })
+
+  return _initPromise
 }
 
-const getOneSignal = () => _oneSignalInstance || window.OneSignal || null
-
-export const requestPushPermission = () => {
+const waitForPlayerId = (OneSignal, timeoutMs = 8000) => {
   return new Promise((resolve) => {
-    const OneSignal = getOneSignal()
-    if (!OneSignal) return resolve(null)
-
-    const cleanup = () => {
-      OneSignal.Notifications.removeEventListener('permissionChange', onPermissionChange)
+    const start = Date.now()
+    const poll = () => {
+      const id = OneSignal.User?.PushSubscription?.id
+      if (id) return resolve(id)
+      if (Date.now() - start > timeoutMs) return resolve(null)
+      setTimeout(poll, 300)
     }
-
-    const onPermissionChange = async (granted) => {
-      cleanup()
-      if (!granted) return resolve(null)
-      const playerId = OneSignal.User.PushSubscription.id
-      resolve(playerId || null)
-    }
-
-    OneSignal.Notifications.addEventListener('permissionChange', onPermissionChange)
-
-    OneSignal.Slidedown.promptPush().catch((err) => {
-      console.error('Push prompt error:', err)
-      cleanup()
-      resolve(null)
-    })
+    poll()
   })
+}
+
+export const requestPushPermission = async () => {
+  try {
+    if (!('Notification' in window)) return null
+
+    const current = Notification.permission
+    if (current === 'denied') return null
+
+    if (current !== 'granted') {
+      const result = await Notification.requestPermission()
+      if (result !== 'granted') return null
+    }
+
+    const OneSignal = await initOneSignal()
+    if (!OneSignal) return null
+
+    await OneSignal.User.PushSubscription.optIn()
+
+    const playerId = await waitForPlayerId(OneSignal)
+    return playerId || null
+  } catch (err) {
+    console.error('Push permission error:', err)
+    return null
+  }
 }
 
 export const getPlayerId = async () => {
   try {
-    const OneSignal = getOneSignal()
+    const OneSignal = window.OneSignal
     if (!OneSignal) return null
-    const subscribed = await OneSignal.User.PushSubscription.optedIn
+    const subscribed = OneSignal.User?.PushSubscription?.optedIn
     if (!subscribed) return null
     return OneSignal.User.PushSubscription.id || null
   } catch {
@@ -99,9 +101,10 @@ export const getPlayerId = async () => {
 
 export const isPushSubscribed = async () => {
   try {
-    const OneSignal = getOneSignal()
+    if (Notification.permission !== 'granted') return false
+    const OneSignal = window.OneSignal
     if (!OneSignal) return false
-    return !!(await OneSignal.User.PushSubscription.optedIn)
+    return !!(OneSignal.User?.PushSubscription?.optedIn)
   } catch {
     return false
   }
@@ -109,7 +112,7 @@ export const isPushSubscribed = async () => {
 
 export const optOutPush = async () => {
   try {
-    const OneSignal = getOneSignal()
+    const OneSignal = window.OneSignal
     if (!OneSignal) return
     await OneSignal.User.PushSubscription.optOut()
   } catch (err) {
@@ -119,10 +122,11 @@ export const optOutPush = async () => {
 
 export const optInPush = async () => {
   try {
-    const OneSignal = getOneSignal()
+    const OneSignal = await initOneSignal()
     if (!OneSignal) return null
     await OneSignal.User.PushSubscription.optIn()
-    return OneSignal.User.PushSubscription.id || null
+    const playerId = await waitForPlayerId(OneSignal)
+    return playerId || null
   } catch (err) {
     console.error('Push opt-in error:', err)
     return null

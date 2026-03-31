@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut, BellOff } from 'lucide-react';
+import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut, BellOff, CircleAlert as AlertCircle } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
 import { requestPushPermission, optOutPush } from '../lib/onesignal';
@@ -11,8 +11,20 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const [saved, setSaved] = useState(false);
   const [emailPending, setEmailPending] = useState(false);
   const [saveError, setSaveError] = useState('');
-  const [pushSubscribed, setPushSubscribed] = useState(!!user.onesignalPlayerId);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
+  const [pushDenied, setPushDenied] = useState(false);
+
+  useEffect(() => {
+    const browserPermission = 'Notification' in window ? Notification.permission : 'default';
+    if (browserPermission === 'denied') {
+      setPushDenied(true);
+      setPushSubscribed(false);
+    } else {
+      setPushDenied(false);
+      setPushSubscribed(!!user.onesignalPlayerId && browserPermission === 'granted');
+    }
+  }, [user.onesignalPlayerId]);
 
   const myPrayers = prayers.filter(p => p.ownerId === user.id);
   const answeredPrayers = myPrayers.filter(p => p.status === 'answered');
@@ -23,6 +35,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const avatarColor = getAvatarColor(user.name);
 
   const handleTogglePush = async () => {
+    if (pushDenied) return;
     setPushLoading(true);
     try {
       if (pushSubscribed) {
@@ -34,6 +47,9 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         if (playerId) {
           await saveOneSignalPlayerId(playerId);
           setPushSubscribed(true);
+        } else {
+          const newPermission = 'Notification' in window ? Notification.permission : 'default';
+          if (newPermission === 'denied') setPushDenied(true);
         }
       }
     } finally {
@@ -182,19 +198,25 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         <div className="glass-card rounded-2xl overflow-hidden">
           <button
             onClick={handleTogglePush}
-            disabled={pushLoading}
+            disabled={pushLoading || pushDenied}
             className="w-full flex items-center gap-3 px-4 py-3.5 transition-opacity disabled:cursor-default"
           >
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#111111', color: pushSubscribed ? '#4a9e74' : '#a89060' }}>
-              {pushSubscribed ? <Bell size={16} /> : <BellOff size={16} />}
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#111111', color: pushDenied ? '#ef4444' : pushSubscribed ? '#4a9e74' : '#a89060' }}>
+              {pushDenied ? <AlertCircle size={16} /> : pushSubscribed ? <Bell size={16} /> : <BellOff size={16} />}
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold" style={{ color: '#f0ede0' }}>Push Notifications</p>
-              <p className="text-xs" style={{ color: '#c8b99a' }}>
-                {pushLoading ? (pushSubscribed ? 'Turning off...' : 'Requesting permission...') : pushSubscribed ? 'Enabled — get notified when someone prays for you' : 'Tap to enable prayer notifications'}
+              <p className="text-xs" style={{ color: pushDenied ? '#ef4444' : '#c8b99a' }}>
+                {pushDenied
+                  ? 'Blocked in browser — enable in site settings'
+                  : pushLoading
+                    ? (pushSubscribed ? 'Turning off...' : 'Enabling notifications...')
+                    : pushSubscribed
+                      ? 'Enabled — get notified when someone prays for you'
+                      : 'Tap to enable prayer notifications'}
               </p>
             </div>
-            {!pushLoading && !pushSubscribed && <ChevronRight size={14} style={{ color: '#a89060' }} />}
+            {!pushLoading && !pushSubscribed && !pushDenied && <ChevronRight size={14} style={{ color: '#a89060' }} />}
             {!pushLoading && pushSubscribed && <Check size={14} style={{ color: '#4a9e74' }} />}
           </button>
 
