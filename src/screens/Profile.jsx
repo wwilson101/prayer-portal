@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { User, Mail, Phone, CreditCard as Edit3, Check, Bell, Shield, Heart, Users, ChevronRight, LogOut, BellOff } from 'lucide-react';
 import logo from '../assets/Prayer_Portal_logo.png';
 import { getInitials, getAvatarColor } from '../utils/helpers';
-import { requestPushPermission, isPushSubscribed } from '../lib/onesignal';
-import { saveOneSignalPlayerId } from '../lib/profile';
+import { requestPushPermission, isPushSubscribed, optOutPush, optInPush } from '../lib/onesignal';
+import { saveOneSignalPlayerId, clearOneSignalPlayerId } from '../lib/profile';
 
 export default function Profile({ user, prayers, groups, onUpdateUser, onLogout }) {
   const [editing, setEditing] = useState(false);
@@ -27,13 +27,18 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
   const avatarColor = getAvatarColor(user.name);
 
   const handleTogglePush = async () => {
-    if (pushSubscribed) return;
     setPushLoading(true);
     try {
-      const playerId = await requestPushPermission();
-      if (playerId) {
-        await saveOneSignalPlayerId(playerId);
-        setPushSubscribed(true);
+      if (pushSubscribed) {
+        await optOutPush();
+        await clearOneSignalPlayerId();
+        setPushSubscribed(false);
+      } else {
+        const playerId = await requestPushPermission() || await optInPush();
+        if (playerId) {
+          await saveOneSignalPlayerId(playerId);
+          setPushSubscribed(true);
+        }
       }
     } finally {
       setPushLoading(false);
@@ -181,7 +186,7 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
         <div className="glass-card rounded-2xl overflow-hidden">
           <button
             onClick={handleTogglePush}
-            disabled={pushSubscribed || pushLoading}
+            disabled={pushLoading}
             className="w-full flex items-center gap-3 px-4 py-3.5 transition-opacity disabled:cursor-default"
           >
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#111111', color: pushSubscribed ? '#4a9e74' : '#a89060' }}>
@@ -190,11 +195,11 @@ export default function Profile({ user, prayers, groups, onUpdateUser, onLogout 
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold" style={{ color: '#f0ede0' }}>Push Notifications</p>
               <p className="text-xs" style={{ color: '#c8b99a' }}>
-                {pushLoading ? 'Requesting permission...' : pushSubscribed ? 'Enabled — get notified when someone prays for you' : 'Tap to enable prayer notifications'}
+                {pushLoading ? (pushSubscribed ? 'Turning off...' : 'Requesting permission...') : pushSubscribed ? 'Enabled — get notified when someone prays for you' : 'Tap to enable prayer notifications'}
               </p>
             </div>
-            {!pushSubscribed && !pushLoading && <ChevronRight size={14} style={{ color: '#a89060' }} />}
-            {pushSubscribed && <Check size={14} style={{ color: '#4a9e74' }} />}
+            {!pushLoading && !pushSubscribed && <ChevronRight size={14} style={{ color: '#a89060' }} />}
+            {!pushLoading && pushSubscribed && <Check size={14} style={{ color: '#4a9e74' }} />}
           </button>
 
           {[

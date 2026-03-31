@@ -95,3 +95,25 @@ export const isPushSubscribed = async () => {
     return false
   }
 }
+
+export const optOutPush = async () => {
+  try {
+    const OneSignal = getOneSignal()
+    if (!OneSignal) return
+    await OneSignal.User.PushSubscription.optOut()
+  } catch (err) {
+    console.error('Push opt-out error:', err)
+  }
+}
+
+export const optInPush = async () => {
+  try {
+    const OneSignal = getOneSignal()
+    if (!OneSignal) return null
+    await OneSignal.User.PushSubscription.optIn()
+    return OneSignal.User.PushSubscription.id || null
+  } catch (err) {
+    console.error('Push opt-in error:', err)
+    return null
+  }
+}
